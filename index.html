@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face-o-Meter by Aamir - HEAVY EDITION</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Press+Start+2P&family=Permanent+Marker&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="app-container">
+        
+        <div id="modes-screen" class="screen active">
+            <h1 class="glitch">FACE-O-METER <span class="by-aamir">by Aamir</span></h1>
+            <div class="animated-line"></div>
+            
+            <label for="mode-select">CHOOSE YOUR VIBE:</label>
+            <select id="mode-select" class="heavy-dropdown">
+                </select>
+
+            <button id="start-scan-btn" class="button-primary start-button">🔥 START SCAN 🔥</button>
+        </div>
+
+        <div id="scan-screen" class="screen">
+            <h2 class="scan-title">SCANNING IN PROGRESS...</h2>
+            <div class="video-frame-container">
+                <video id="videoElement" autoplay></video>
+                <div class="scanner-line"></div> <div class="scanner-overlay-corner"></div> 
+            </div>
+            <div id="scanning-indicator">Initializing... <span id="timer-display">3</span></div>
+        </div>
+
+        <div id="result-screen" class="screen">
+            <div class="result-image-frame">
+                <canvas id="capturedCanvas"></canvas>
+            </div>
+            
+            <div id="comment-area" class="result-text-box">
+                </div>
+
+            <div class="control-buttons">
+                <button id="new-scan-btn" class="button-secondary">🔄 NEW SCAN</button>
+                <button id="back-to-modes-btn" class="button-primary">🏠 CHANGE VIBE</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
