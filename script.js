@@ -1,4 +1,4 @@
-// --- 1. MODES DATA (Heavy-but-Safe Comments) ---
+// --- 1. MODES DATA (No Change) ---
 const modes = [
     {
         id: 'placeholder',
@@ -11,8 +11,8 @@ const modes = [
         name: '😈 The Roasting King (Heavy but Safe)',
         styleClass: 'roast-style',
         comments: [
-            "Screen toot jayegi, itna ghoor ke mat dekho! 💔", // Requested heavy line
-            "Aaj kal face ki battery low lag rahi hai. Time pe so jao! 😴",
+            "SCAN FAILURE: Screen toot jayegi, itna ghoor ke mat dekho! 💔", 
+            "ERROR 404: Face battery low. Initiate urgent sleep protocol! 😴",
             "Mausam ki tarah badalna toh sunna tha, lekin expression? 🤷‍♂️",
             "Tumhari selfie is waqt duniya ka 8th ajooba hai. Kyun? Raaz hai! 😉"
         ]
@@ -22,8 +22,8 @@ const modes = [
         name: '🤫 Gossip Guru (Secrets & Rumours)',
         styleClass: 'gossip-style',
         comments: [
-            "Pata chala hai... tumhara charger 99% tak hi support karta hai! 🔌",
-            "Tumhare Google search history mein 90% sirf 'how to get rich' hai. 🤫",
+            "ALERT: Pata chala hai... tumhara charger 99% tak hi support karta hai! 🔌",
+            "LOGS: Tumhare Google search history mein 90% sirf 'how to get rich' hai. 🤫",
             "Subah ki pehli selfie toh tumhari asliyat chupa leti hai! 👀",
             "Aapka sabse bada raaz: Aap chupke se dance videos dekhte hain! 🕺"
         ]
@@ -34,7 +34,7 @@ const modes = [
         styleClass: 'philosopher-style',
         comments: [
             "Gahrai se dekho... kya tumne woh pizza order kiya tha? Vahi sach hai. 🍕",
-            "Zindagi ek safar hai, aur tumhara data plan khatam ho chuka hai. 💡",
+            "Zindagi ek safar hai, aur tumhara data plan khatam ho chuka hai.💡",
             "Har chehre ke peeche ek adhoora khwab hota hai: Sahi time pe milne wali chai. ☕",
             "Sochta hu, kya sochta hu? Bass, yahi sachai hai. (Panda ka niyam) 🧘‍♂️"
         ]
@@ -42,7 +42,7 @@ const modes = [
 ];
 
 // --- 2. ELEMENT REFERENCES & STATE ---
-let currentMode = modes[0]; // Start with placeholder
+let currentMode = modes[0]; 
 let videoStream = null;
 
 const modesScreen = document.getElementById('modes-screen');
@@ -53,19 +53,27 @@ const startScanBtn = document.getElementById('start-scan-btn');
 
 const videoElement = document.getElementById('videoElement');
 const capturedCanvas = document.getElementById('capturedCanvas');
-const commentArea = document.getElementById('comment-area');
 const timerDisplay = document.getElementById('timer-display');
 const newScanBtn = document.getElementById('new-scan-btn');
 const backToModesBtn = document.getElementById('back-to-modes-btn');
+const resultDisplayFrame = document.querySelector('.result-display-frame'); 
 
 // --- 3. CORE FUNCTIONS ---
 
 function switchScreen(targetId) {
-    stopCamera();
+    if (resultDisplayFrame) {
+        resultDisplayFrame.classList.remove('active');
+    }
+    
     [modesScreen, scanScreen, resultScreen].forEach(screen => {
         screen.classList.remove('active');
     });
     document.getElementById(targetId).classList.add('active');
+    
+    // Stop camera only when switching AWAY from the scan screen
+    if (targetId !== 'scan-screen') {
+        stopCamera();
+    }
 }
 
 function stopCamera() {
@@ -75,133 +83,168 @@ function stopCamera() {
     }
 }
 
-// Function to start the camera and timer
 function startScan() {
     if (currentMode.id === 'placeholder') {
-        alert("Pehle 'Vibe' toh select kar lo, Aamir! 😉");
+        alert("Please select a scan protocol, Aamir! 😉");
         return;
     }
     
+    const scannerLine = document.querySelector('.real-scanner-line');
+    // Force restart animation
+    scannerLine.style.animation = 'none';
+    void scannerLine.offsetWidth; 
+    scannerLine.style.animation = 'realScan 1.5s linear infinite alternate'; 
+
     switchScreen('scan-screen');
     let scanDuration = 3; 
     timerDisplay.textContent = scanDuration;
     
-    // Request camera access
     navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
         .then(stream => {
             videoStream = stream;
             videoElement.srcObject = stream;
             
-            // Start Timer
-            const timerInterval = setInterval(() => {
-                scanDuration--;
-                timerDisplay.textContent = scanDuration;
+            videoElement.onloadeddata = () => { 
+                const timerInterval = setInterval(() => {
+                    scanDuration--;
+                    timerDisplay.textContent = scanDuration;
 
-                if (scanDuration <= 0) {
-                    clearInterval(timerInterval);
-                    captureAndShowResult();
-                }
-            }, 1000);
+                    if (scanDuration <= 0) {
+                        clearInterval(timerInterval);
+                        videoElement.onloadeddata = null; 
+                        
+                        // **Use a small delay to ensure frame rendering is complete**
+                        setTimeout(captureAndShowResult, 100); 
+                    }
+                }, 1000);
+            };
 
         })
         .catch(err => {
-            alert("Camera access denied! Face-o-Meter chala nahi sakta. 😥");
+            alert("SYSTEM ERROR: Camera access denied! 😥");
             stopCamera();
             switchScreen('modes-screen');
         });
 }
 
+// ** PIC CAPTURE FINAL LOGIC (stopCamera moved AFTER drawing) **
 function captureAndShowResult() {
-    stopCamera();
-
-    // 1. Capture Image to Canvas
     const context = capturedCanvas.getContext('2d');
+    
+    // Set canvas dimensions
     capturedCanvas.width = videoElement.videoWidth;
     capturedCanvas.height = videoElement.videoHeight;
     
-    context.save();
-    context.scale(-1, 1);
-    context.drawImage(videoElement, capturedCanvas.width * -1, 0, capturedCanvas.width, capturedCanvas.height);
-    context.restore();
-    
-    // 2. Get Random Comment
-    const selectedMode = currentMode;
-    const randomIndex = Math.floor(Math.random() * selectedMode.comments.length);
-    const finalComment = selectedMode.comments[randomIndex];
+    // Check if valid dimensions exist
+    if (capturedCanvas.width > 10 && capturedCanvas.height > 10) {
+        
+        // DRAW THE IMAGE FIRST
+        context.save();
+        context.scale(-1, 1);
+        context.drawImage(videoElement, capturedCanvas.width * -1, 0, capturedCanvas.width, capturedCanvas.height);
+        context.restore(); 
+        
+        // STOP CAMERA AFTER DRAWING IS COMPLETE
+        stopCamera(); 
+        
+        // Get Random Comment
+        const selectedMode = currentMode;
+        const randomIndex = Math.floor(Math.random() * selectedMode.comments.length);
+        const finalComment = selectedMode.comments[randomIndex];
 
-    // 3. Display Comment on HTML
-    commentArea.innerHTML = `<span class="${selectedMode.styleClass}">${finalComment}</span>`;
-    
-    // 4. Draw Teerha Merha Text on Canvas
-    drawTeerhaMerhaText(finalComment, selectedMode.styleClass);
+        // Draw Horizontal Funny Text on Canvas
+        drawHorizontalFunnyText(finalComment, selectedMode.styleClass);
 
-    // 5. Switch to Result Screen
+    } else {
+        // FALLBACK: Draw black screen with error message if frame is still not ready
+        capturedCanvas.width = 640;
+        capturedCanvas.height = 480;
+        context.fillStyle = 'black';
+        context.fillRect(0, 0, capturedCanvas.width, capturedCanvas.height);
+        context.fillStyle = 'white';
+        context.font = '20px Orbitron';
+        context.textAlign = 'center';
+        context.fillText('FATAL ERROR: FRAME UNAVAILABLE. RE-SCAN.', capturedCanvas.width / 2, capturedCanvas.height / 2);
+        
+        // Still stop the camera stream
+        stopCamera();
+    }
+    
+    // Switch to Result Screen
     switchScreen('result-screen');
+    
+    // Trigger the Pop-out Effect
+    setTimeout(() => {
+        if (resultDisplayFrame) {
+             resultDisplayFrame.classList.add('active');
+        }
+    }, 50); 
 }
 
-// --- 4. TEERHA MERHA TEXT DRAWING LOGIC (New Heavy Feature) ---
-function drawTeerhaMerhaText(text, styleClass) {
+// --- 4. FUNNY HORIZONTAL TEXT DRAWING LOGIC (Using Bangers on Dark BG) ---
+function drawHorizontalFunnyText(text, styleClass) {
     const context = capturedCanvas.getContext('2d');
     const canvasWidth = capturedCanvas.width;
     const canvasHeight = capturedCanvas.height;
     
-    // Background rectangle for text
-    context.globalAlpha = 0.7;
-    context.fillStyle = 'black';
-    context.fillRect(0, canvasHeight - 170, canvasWidth, 170);
-    context.globalAlpha = 1.0;
+    // Solid background for text box for better contrast
+    context.globalAlpha = 0.9;
+    context.fillStyle = 'rgba(0, 0, 0, 0.9)'; 
+    context.fillRect(0, canvasHeight - 150, canvasWidth, 150);
+    context.globalAlpha = 1.0; 
 
-    // Font selection
-    let fontFamily = 'Impact, fantasy'; 
-    let fontColor = '#ffdd00';
-    let fontSize = canvasWidth > 500 ? 45 : 30;
+    // Font selection (Bangers for FUNKY look, on dark theme)
+    let fontFamily = 'Bangers, cursive'; 
+    let fontColor = '#00ff00'; // Default Neon Green
+
+    // Adjust font size based on canvas width
+    let fontSize = 35; 
+    if (canvasWidth > 700) { fontSize = 50; } 
+    else if (canvasWidth > 500) { fontSize = 40; }
 
     if (styleClass === 'roast-style') {
-        fontFamily = 'Bangers, cursive'; 
-        fontColor = '#ff3333'; 
+        fontColor = '#ff3333'; // Vibrant Red
     } else if (styleClass === 'gossip-style') {
-        fontFamily = 'Permanent Marker, cursive'; 
-        fontColor = '#00ffff'; 
-        fontSize = canvasWidth > 500 ? 35 : 25;
+        fontColor = '#00ff00'; // Neon Green
     } else if (styleClass === 'philosopher-style') {
-        fontFamily = 'Georgia, serif'; 
-        fontColor = '#ccff00';
-        fontSize = canvasWidth > 500 ? 35 : 25;
+        fontColor = '#00ffff'; // Neon Cyan
     }
     
     context.fillStyle = fontColor;
     context.textAlign = 'center';
+    context.shadowColor = 'rgba(0,0,0,0.8)'; 
+    context.shadowBlur = 10; 
+    context.font = `bold ${fontSize}px ${fontFamily}`;
     
-    const words = text.split(' ');
-    let currentY = canvasHeight - 130;
-    const lineHeight = fontSize * 1.3;
-    let currentX = canvasWidth / 2;
+    const lineHeight = fontSize * 1.1;
 
-    context.shadowColor = 'black';
-    context.shadowBlur = 5;
+    // Logic to wrap text horizontally
+    function getLines(ctx, text, maxWidth) {
+        const words = text.split(" ");
+        let lines = [];
+        let currentLine = words[0] || '';
 
-    // Drawing each word teerha-merha
-    words.forEach((word, index) => {
-        context.save();
-        
-        // Random rotation (Teerha) and shift (Merha)
-        const rotation = (Math.random() * 0.2 - 0.1); // -0.1 to 0.1 radians
-        const shiftX = (Math.random() * 30 - 15);
-        
-        context.translate(currentX + shiftX, currentY);
-        context.rotate(rotation);
-        
-        context.font = `bold ${fontSize}px ${fontFamily}`;
-        context.fillText(word, 0, 0);
-        
-        context.restore();
-
-        currentY += lineHeight;
-        if (currentY > canvasHeight - 30) {
-            // New line ke liye reset
-            currentY = canvasHeight - 130; 
-            currentX = Math.random() < 0.5 ? canvasWidth / 4 : canvasWidth * 0.75; // Left ya Right shift
+        for (let i = 1; i < words.length; i++) {
+            const word = words[i];
+            const width = ctx.measureText(currentLine + " " + word).width;
+            if (width < maxWidth) {
+                currentLine += " " + word;
+            } else {
+                lines.push(currentLine);
+                currentLine = word;
+            }
         }
+        lines.push(currentLine);
+        return lines.filter(line => line.trim() !== '');
+    }
+
+    const lines = getLines(context, text, canvasWidth * 0.9); 
+
+    // Adjust Y start position to center text vertically in the black strip
+    let currentY = canvasHeight - 150 + (150 / 2) - ((lines.length * lineHeight) / 2) + (fontSize * 0.3); 
+
+    lines.forEach((lineText, index) => {
+        context.fillText(lineText, canvasWidth / 2, currentY + (index * lineHeight));
     });
 
     context.shadowBlur = 0;
@@ -210,34 +253,25 @@ function drawTeerhaMerhaText(text, styleClass) {
 
 // --- 5. EVENT LISTENERS & INIT ---
 
-// Dropdown change par currentMode update karna
 modeSelect.addEventListener('change', (e) => {
     const selectedModeId = e.target.value;
     currentMode = modes.find(m => m.id === selectedModeId);
 });
 
-// Start Scan button
 startScanBtn.addEventListener('click', startScan);
-
-// New Scan button
 newScanBtn.addEventListener('click', startScan);
-
-// Back to Modes button
 backToModesBtn.addEventListener('click', () => {
-    currentMode = modes[0]; // Reset mode
+    currentMode = modes[0]; 
     modeSelect.value = 'placeholder';
     switchScreen('modes-screen');
 });
 
-// Initial setup
 document.addEventListener('DOMContentLoaded', () => {
-    // Dropdown options dynamically add karna
     modes.forEach(mode => {
         const option = document.createElement('option');
         option.value = mode.id;
         option.textContent = mode.name;
         modeSelect.appendChild(option);
     });
-    // Set placeholder as initial value
     modeSelect.value = 'placeholder';
 });
