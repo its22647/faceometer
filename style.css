@@ -5,7 +5,7 @@
     --color-background: #0a0a0a; /* DEEP NEAR-BLACK */
     --color-surface: #1a1a1a; /* SLIGHTLY LIGHTER DARK SURFACE */
     --color-text: #e0e0e0; /* LIGHT GREY */
-    --color-glow-blue: #00ffff; /* NEON CYAN Glow */
+    --color-glow-blue: #00ffff; /* NEON CYAN Glow (Used for main highlights) */
 }
 body {
     font-family: 'Orbitron', sans-serif; 
@@ -26,7 +26,7 @@ body {
     max-width: 600px; 
     background: var(--color-surface); 
     border: 2px solid var(--color-glow-blue);
-    border-radius: 0; /* Sharp Edges */
+    border-radius: 0; 
     padding: 40px 30px;
     box-shadow: 0 0 50px rgba(0, 255, 255, 0.4), inset 0 0 10px rgba(0, 255, 0, 0.2); 
     text-align: center;
@@ -123,15 +123,14 @@ body {
 /* GUARANTEED SCAN LINE ANIMATION FIX */
 .real-scanner-line {
     position: absolute; left: 0; width: 100%; height: 8px; 
-    background: var(--color-primary); /* Neon Green Line */
+    background: var(--color-primary); 
     box-shadow: 0 0 20px 8px rgba(0, 255, 0, 0.7); 
-    top: 0; /* Start at the top edge */
-    animation: realScan 1.5s linear infinite alternate; /* Simple, reliable top-to-bottom cycle */
+    top: 0; 
+    animation: realScan 1.5s linear infinite alternate; 
     opacity: 0.9;
 }
 @keyframes realScan {
     0% { top: 0%; } 
-    /* Force top-to-bottom movement */
     100% { top: calc(100% - 8px); } 
 }
 
