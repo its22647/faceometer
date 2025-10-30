@@ -245,7 +245,7 @@ function captureAndShowResult() {
     }, 50); 
 }
 
-// --- 4. FUNNY HORIZONTAL TEXT DRAWING LOGIC (MOBILE FONT SCALE FIX - FINAL VERTICAL ADJUSTMENT) ---
+// --- 4. FUNNY HORIZONTAL TEXT DRAWING LOGIC (FINAL FIX FOR MOBILE AND LAPTOP/LARGE SCREEN) ---
 function drawHorizontalFunnyText(text, styleClass) {
     const context = capturedCanvas.getContext('2d');
     const canvasWidth = capturedCanvas.width;
@@ -259,33 +259,28 @@ function drawHorizontalFunnyText(text, styleClass) {
 
     // Font selection (Orbitron for PROFESSIONAL/FUTURISTIC look)
     let fontFamily = 'Orbitron, sans-serif'; 
-    let fontColor = '#ffffff'; // Clean White (More professional)
+    let fontColor = '#ffffff'; 
 
-    // Adjust font size based on canvas width (IMPROVED SCALING)
+    // --- Font Size Calculation ---
     let fontSize; 
     if (canvasWidth > 700) { 
-        fontSize = 55; // Large screen
+        fontSize = 55; // Default for Large screen
     } else if (canvasWidth > 500) { 
-        fontSize = 45; // Medium screen
+        fontSize = 45; // Default for Medium screen (Tablet/Small Laptop)
     } else {
-        // Small screens (Mobiles)
+        // Default for Small screens (Mobiles)
         fontSize = 32; 
         if (canvasWidth < 400) {
-            fontSize = 28; // Extra small screens
+            fontSize = 28; 
         }
     }
 
-    
-    context.fillStyle = fontColor;
-    context.textAlign = 'center';
-    
-    // Adding Neon Shadow/Glow
-    context.shadowColor = '#00ffff'; // Neon Cyan Glow
-    context.shadowBlur = 10; 
+    // Set font for line measurement
     context.font = `bold ${fontSize}px ${fontFamily}`;
     
-    // Line Height further reduced for fitting 3-4 lines on mobile
-    const lineHeight = fontSize * 1.15; // Adjusted line height (was 1.25 -> 1.2)
+    // Line Height
+    const lineHeightFactor = 1.15;
+    const lineHeight = fontSize * lineHeightFactor; 
 
     // TEXT WRAPPING LOGIC (UNCHANGED)
     function getLines(ctx, text, maxWidth) {
@@ -295,9 +290,10 @@ function drawHorizontalFunnyText(text, styleClass) {
 
         for (let i = 1; i < words.length; i++) {
             const word = words[i];
-            // Check if adding the next word exceeds the maxWidth (90% of canvas)
             const width = ctx.measureText(currentLine + " " + word).width;
-            if (width < maxWidth) {
+            const maxTextWidth = canvasWidth * 0.9;
+            
+            if (width < maxTextWidth) {
                 currentLine += " " + word;
             } else {
                 lines.push(currentLine);
@@ -308,22 +304,43 @@ function drawHorizontalFunnyText(text, styleClass) {
         return lines.filter(line => line.trim() !== '');
     }
 
-    // Set maximum width to be slightly less than canvas width (90% of canvas)
+    // Set maximum width (90% of canvas)
     const maxTextWidth = canvasWidth * 0.9;
-    const lines = getLines(context, text, maxTextWidth); 
+    let lines = getLines(context, text, maxTextWidth); 
     
-    // POSITIONING FIX FOR MULTIPLE LINES (FINAL ADJUSTMENT)
+    // *** NEW LOGIC: DYNAMIC FONT REDUCTION FOR MULTIPLE LINES ON LARGE SCREENS ***
+    // Agar lines zyada hain aur screen badi hai, toh font size aur kam kar do.
+    if (lines.length > 2 && canvasWidth > 500) {
+        // Reducing font size significantly for large screens to fit 3-4 lines in 150px
+        fontSize *= 0.75; // e.g., 55px becomes ~41px, 45px becomes ~33px
+        context.font = `bold ${fontSize}px ${fontFamily}`; // Re-set font
+        
+        // Re-calculate lines with new smaller font size
+        lines = getLines(context, text, maxTextWidth); 
+    }
+    
+    // Re-calculate line height based on potentially reduced font size
+    const finalLineHeight = fontSize * lineHeightFactor; 
+
+    context.fillStyle = fontColor;
+    context.textAlign = 'center';
+    
+    // Adding Neon Shadow/Glow
+    context.shadowColor = '#00ffff'; // Neon Cyan Glow
+    context.shadowBlur = 10; 
+
+    // POSITIONING FIX
     
     // Calculate total height occupied by text
-    const totalTextHeight = (lines.length - 1) * lineHeight + fontSize; // Total text height calculation
+    const totalTextHeight = (lines.length - 1) * finalLineHeight + fontSize; // Total text height calculation
     
     // Starting Y position for the first line: Center the text block vertically within the 150px black strip.
-    // Adjusted formula: decreased the factor from 0.9 to 0.7 to pull the text slightly higher within the strip
-    let currentY = canvasHeight - 150 + (150 / 2) - (totalTextHeight / 2) + (fontSize * 0.7); // Final vertical centering
+    // Adjusted to pull text slightly higher (fontSize * 0.7) for better centering
+    let currentY = canvasHeight - 150 + (150 / 2) - (totalTextHeight / 2) + (fontSize * 0.7); 
 
     lines.forEach((lineText, index) => {
         // Draw each line centered horizontally
-        context.fillText(lineText, canvasWidth / 2, currentY + (index * lineHeight));
+        context.fillText(lineText, canvasWidth / 2, currentY + (index * finalLineHeight));
     });
 
     context.shadowBlur = 0; // Reset shadow
