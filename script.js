@@ -1,4 +1,4 @@
-// --- 1. MODES DATA (UPDATED WITH NEW HEAVY ROAST MODES - ONE-WORD ROASTS ARE NOW ENGLISH) ---
+// --- 1. MODES DATA (UNCHANGED) ---
 const modes = [
     {
         id: 'placeholder',
@@ -259,19 +259,19 @@ function drawHorizontalFunnyText(text, styleClass) {
 
     // Font selection (Orbitron for PROFESSIONAL/FUTURISTIC look)
     let fontFamily = 'Orbitron, sans-serif'; 
-    let fontColor = '#ffffff'; 
+    let fontColor = '#ffffff'; // Clean White
 
-    // --- Font Size Calculation ---
+    // --- Font Size Calculation (Initial) ---
     let fontSize; 
     if (canvasWidth > 700) { 
-        fontSize = 55; // Default for Large screen
+        fontSize = 55; // Large screen
     } else if (canvasWidth > 500) { 
-        fontSize = 45; // Default for Medium screen (Tablet/Small Laptop)
+        fontSize = 45; // Medium screen
     } else {
-        // Default for Small screens (Mobiles)
+        // Small screens (Mobiles)
         fontSize = 32; 
         if (canvasWidth < 400) {
-            fontSize = 28; 
+            fontSize = 28; // Extra small screens
         }
     }
 
@@ -280,7 +280,7 @@ function drawHorizontalFunnyText(text, styleClass) {
     
     // Line Height
     const lineHeightFactor = 1.15;
-    const lineHeight = fontSize * lineHeightFactor; 
+    let lineHeight = fontSize * lineHeightFactor; 
 
     // TEXT WRAPPING LOGIC (UNCHANGED)
     function getLines(ctx, text, maxWidth) {
@@ -309,10 +309,10 @@ function drawHorizontalFunnyText(text, styleClass) {
     let lines = getLines(context, text, maxTextWidth); 
     
     // *** NEW LOGIC: DYNAMIC FONT REDUCTION FOR MULTIPLE LINES ON LARGE SCREENS ***
-    // Agar lines zyada hain aur screen badi hai, toh font size aur kam kar do.
+    // Agar lines 2 se zyada hain aur screen badi hai, toh font size kam kar do
     if (lines.length > 2 && canvasWidth > 500) {
-        // Reducing font size significantly for large screens to fit 3-4 lines in 150px
-        fontSize *= 0.75; // e.g., 55px becomes ~41px, 45px becomes ~33px
+        // Reducing font size significantly (25%) for large/medium screens to fit 3-4 lines in 150px strip
+        fontSize *= 0.75; 
         context.font = `bold ${fontSize}px ${fontFamily}`; // Re-set font
         
         // Re-calculate lines with new smaller font size
@@ -335,7 +335,7 @@ function drawHorizontalFunnyText(text, styleClass) {
     const totalTextHeight = (lines.length - 1) * finalLineHeight + fontSize; // Total text height calculation
     
     // Starting Y position for the first line: Center the text block vertically within the 150px black strip.
-    // Adjusted to pull text slightly higher (fontSize * 0.7) for better centering
+    // Adjusted to pull text slightly higher (fontSize * 0.7) for optimal centering in the strip
     let currentY = canvasHeight - 150 + (150 / 2) - (totalTextHeight / 2) + (fontSize * 0.7); 
 
     lines.forEach((lineText, index) => {
