@@ -1,4 +1,4 @@
-// --- 1. MODES DATA (UNCHANGED) ---
+// --- 1. MODES DATA (UPDATED WITH 30 NEW HEAVY ROASTS) ---
 const modes = [
     {
         id: 'placeholder',
@@ -11,12 +11,13 @@ const modes = [
         name: '😈 The Roasting King (Heavy but Safe)',
         styleClass: 'roast-style',
         comments: [
+            // Original Roasts (4)
             "SCAN FAILURE: Screen toot jayegi, itna ghoor ke mat dekho! 💔 Ghoorna band karo!", 
             "ERROR 404: Face battery low. Initiate urgent sleep protocol! 😴 Sona hi hal hai.",
             "Mausam ki tarah badalna toh sunna tha, lekin expression? 🤷‍♂️ Har 2 sec mein mood off.",
             "Tumhari selfie is waqt duniya ka 8th ajooba hai. Kyun? Raaz hai! 😉 Khud hi socho.",
             
-            // 30 New Roman Urdu Roasts (PUNCHIER)
+            // First Batch of 30 Roman Urdu Roasts 
             "WARNING: Tumhara mood 50% battery par hai. Foran charge karein ya coffee peelo! ☕",
             "System Error: Aap scan nahi ho paye shakal ki wajah se! 😩",
             "Alert: Shakal pe 'Out of Stock' ka board laga hua hai. Refresh bhi bekaar hai! 🚫",
@@ -48,7 +49,39 @@ const modes = [
             "Virus Detected: Tumhari overthinking ki bimari pakdi gayi hai. Ilaaj karwao. 💊",
             "Caution: Tumhari hasi mein thoda sa 'shaytani' element hai. Pata chal gaya! 😈",
             "FINAL VERDICT: Aapka style purana ho chuka hai, update required! Get a new look. 💇",
-            "REJECTED: Next time, filter lagana mat bhoolna, please. Yeh 'no filter' theek nahi hai. 🤦" 
+            "REJECTED: Next time, filter lagana mat bhoolna, please. Yeh 'no filter' theek nahi hai. 🤦",
+
+            // *** NEW BATCH OF 30 HEAVY ROASTS ADDED HERE ***
+            "LIFE GOAL: Tumhari zindagi mein sirf do cheezein hain: late hona aur phir bhi complain karna. Badlo!",
+            "REALITY CHECK: Tumhara bank balance aur tumhari akal dono hi 'critical low' par hain. 📉",
+            "SCAM ALERT: Tumhari promise aur tumhari neend, dono pe bharosa nahi kiya ja sakta. Jhoote! 🤥",
+            "CPU USAGE: Tumhara dimagh itna slow chalta hai ki 2G internet bhi tumse tez hai. 🐌",
+            "INVESTIGATION: Tumhari shakal dekh ke lagta hai, jaise tum roz subah uth ke doosron ki khushiyan churane nikle ho. 🔪",
+            "DESIGN FLAW: Tumhari personality mein koi 'wow' factor nahi hai, bas default settings hain. Boring! 😐",
+            "SERVER DOWN: Jab tum baat karte ho, puri mehfil mute ho jaati hai. Please, no thanks! 🔇",
+            "OBSERVATION: Tumhari energy sirf 'bakwas' aur 'overacting' mein kharch hoti hai. Wapis le lo! 🎭",
+            "DANGEROUS: Tumhara attitude, tumhari IQ se zyada hai. Balance theek karo! ⚖️",
+            "FASHION CRIME: Tumhare kapde bata rahe hain ki tumhein life mein koi direction nahi mili. Maze karo! 🧭",
+            "TRUTH BOMB: Tumhara future tumhari present ki tarah 'loading...' par atak gaya hai. Kab poora hoga? ⏳",
+            "SYSTEM FREEZE: Itni serious shakal kyun bana rakhi hai? Koi comedy show dekh lo. 😂",
+            "CHEAT CODE: Tum life mein shortcut dhoondhte ho, aur woh tumhein chhod kar ja chuka hai. Piche mat dekho. 🏃‍♂️",
+            "VIRAL FAIL: Tumhari videos par views nahi aate, kyunki tum 'clickbait' ho. Reality kuch aur hai! 💔",
+            "INCOMPATIBLE: Tum aur mehnat ek doosre ke liye nahi bane. Try again in 2050. 💤",
+            "SECRET EXPOSED: Tumhe lagta hai tum smart ho, lekin mere system ne bata diya, tum bas 'acting' kar rahe ho. 🤖",
+            "BLACK HOLE: Tumhari bhook kabhi khatam nahi hoti, poora fridge kha jate ho. Stop it! 🍕",
+            "ECHO CHAMBER: Tumhe sirf apni baat sunni hai, doosron ki baat toh aira gaira hai. Suno bhi! 👂",
+            "FAKE GLOW: Tumhari smile artificial hai, glow toh bas filter ka hai. Original dikhao! ✨",
+            "LOUD WARNING: Agar tumne abhi bhi 'phone chhod do' nahi suna, toh tumhari life bell baj jayegi. Ring-ring! 🔔",
+            "MAJOR GLITCH: Tumhari memory itni weak hai ki tum kal ka roast bhi bhool jate ho. Yaad rakho! 🧠",
+            "SHAME SHAME: Tum roz subah nahaate nahi ho, ye system janta hai. Chupao mat! 🚿",
+            "POOR CHOICE: Tumhare dost tumhari tarah hi hain. Ghalat company! Improve yourself. 🚶‍♀️",
+            "CRINGE: Tumhari baatein aur tumhari harkatein, dono hi out of date hain. Update karo! 💾",
+            "ZINDAGI SE HAAR: Tumhari zindagi mein motivation 'zero' hai. Utho aur kuch karo. 🚀",
+            "PASSPORT DENIED: Tumhari shakal dekh ke lagta hai, tum kisi aur planet se aaye ho. Wapis jao! 👽",
+            "IDENTITY CRISIS: Tumhe khud nahi pata tum kya ho aur kya karna hai. Confused! 🤔",
+            "SLEEP PARALYSIS: Tumhara din raat mein shuru hota hai. Abhi bhi theek time hai, jaldi so jao. 🌙",
+            "NO COMMENT: Tumhari har baat ka jawab sirf meri khamoshi hai. Ab chup ho jao. 😶",
+            "PERMANENT STATUS: Tum hamesha 'Guzara Time' mein rahoge. Kuch bada socho! 🏆"
         ]
     },
     {
@@ -245,7 +278,7 @@ function captureAndShowResult() {
     }, 50); 
 }
 
-// --- 4. FUNNY HORIZONTAL TEXT DRAWING LOGIC (FINAL FIX FOR MOBILE AND LAPTOP/LARGE SCREEN) ---
+// --- 4. FUNNY HORIZONTAL TEXT DRAWING LOGIC (FINAL FIX FOR MOBILE AND LAPTOP/LARGE SCREEN - UNCHANGED) ---
 function drawHorizontalFunnyText(text, styleClass) {
     const context = capturedCanvas.getContext('2d');
     const canvasWidth = capturedCanvas.width;
@@ -308,10 +341,9 @@ function drawHorizontalFunnyText(text, styleClass) {
     const maxTextWidth = canvasWidth * 0.9;
     let lines = getLines(context, text, maxTextWidth); 
     
-    // *** NEW LOGIC: DYNAMIC FONT REDUCTION FOR MULTIPLE LINES ON LARGE SCREENS ***
-    // Agar lines 2 se zyada hain aur screen badi hai, toh font size kam kar do
+    // *** DYNAMIC FONT REDUCTION LOGIC: Final adjustment for multi-line text on large screens ***
     if (lines.length > 2 && canvasWidth > 500) {
-        // Reducing font size significantly (25%) for large/medium screens to fit 3-4 lines in 150px strip
+        // Reducing font size (25%)
         fontSize *= 0.75; 
         context.font = `bold ${fontSize}px ${fontFamily}`; // Re-set font
         
@@ -335,7 +367,6 @@ function drawHorizontalFunnyText(text, styleClass) {
     const totalTextHeight = (lines.length - 1) * finalLineHeight + fontSize; // Total text height calculation
     
     // Starting Y position for the first line: Center the text block vertically within the 150px black strip.
-    // Adjusted to pull text slightly higher (fontSize * 0.7) for optimal centering in the strip
     let currentY = canvasHeight - 150 + (150 / 2) - (totalTextHeight / 2) + (fontSize * 0.7); 
 
     lines.forEach((lineText, index) => {
