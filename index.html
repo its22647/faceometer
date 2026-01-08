@@ -4,30 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Face-o-Meter by Aamir - FINAL COMMAND PROTOCOL</title>
-    
     <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Orbitron:wght@400;700&family=Press+Start+2P&family=Permanent+Marker&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
     <div id="app-container">
-        
         <div id="modes-screen" class="screen active">
             <h1 class="app-title">FACE-O-METER <span class="app-subtitle">by Aamir</span></h1>
             <div class="glow-divider"></div>
-            
             <label for="mode-select" class="input-label">INITIATE SCAN PROTOCOL:</label>
-            <select id="mode-select" class="cyber-dropdown">
-                </select>
-
+            <select id="mode-select" class="cyber-dropdown"></select>
             <button id="start-scan-btn" class="cyber-button primary-button">>>> BEGIN ANALYSIS <<<</button>
         </div>
 
         <div id="scan-screen" class="screen">
             <h2 class="scan-status">ACQUIRING TARGET DATA...</h2>
             <div class="video-display-area">
-                <video id="videoElement" autoplay></video>
+                <video id="videoElement" autoplay playsinline></video>
                 <div class="real-scanner-line"></div> 
             </div>
             <div id="scanning-indicator" class="scan-timer">SCAN INITIATED: <span id="timer-display">3</span> SECONDS</div>
@@ -37,7 +30,6 @@
             <div class="result-display-frame">
                 <canvas id="capturedCanvas"></canvas>
             </div>
-            
             <div class="control-panel">
                 <button id="new-scan-btn" class="cyber-button secondary-button">🔄 RE-SCAN</button>
                 <button id="back-to-modes-btn" class="cyber-button primary-button">🏠 SELECT NEW PROTOCOL</button>
@@ -45,6 +37,6 @@
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script type="module" src="script.js"></script>
 </body>
 </html>

