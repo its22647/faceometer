@@ -2,7 +2,7 @@
 const cloudName = "dy4kgfvpw";
 const uploadPreset = "faceometer_preset"; 
 
-// --- 1. MODES DATA (YOUR EXACT ORIGINAL DATA) ---
+// --- 1. MODES DATA (COMPLETE LIST - NO CUTS) ---
 const modes = [
     {
         id: 'placeholder',
@@ -55,32 +55,32 @@ const modes = [
             "REALITY CHECK: Tumhara bank balance aur tumhari akal dono hi 'critical low' par hain. 📉",
             "SCAM ALERT: Tumhari promise aur tumhari neend, dono pe bharosa nahi kiya ja sakta. Jhoote! 🤥",
             "CPU USAGE: Tumhara dimagh itna slow chalta hai ki 2G internet bhi tumse tez hai. 🐌",
-            "INVESTIGATION: Tumhari shakal dekh ke lagta hai, jaise tum roz subah uth ke doosron ki khushiyan churane nikle ho. 🔪",
+            "INVESTIGATION: Tumhari shakal dekh ke lagta hai, jaise तुम roz subah uth ke doosron ki khushiyan churane nikle ho. 🔪",
             "DESIGN FLAW: Tumhari personality mein koi 'wow' factor nahi hai, bas default settings hain. Boring! 😐",
-            "SERVER DOWN: Jab tum baat karte ho, puri mehfil mute ho jaati hai. Please, no thanks! 🔇",
+            "SERVER DOWN: Jab तुम baat karte ho, puri mehfil mute ho jaati hai. Please, no thanks! 🔇",
             "OBSERVATION: Tumhari energy sirf 'bakwas' aur 'overacting' mein kharch hoti hai. Wapis le lo! 🎭",
             "DANGEROUS: Tumhara attitude, tumhari IQ se zyada hai. Balance theek karo! ⚖️",
             "FASHION CRIME: Tumhare kapde bata rahe hain ki tumhein life mein koi direction nahi mili. Maze karo! 🧭",
             "TRUTH BOMB: Tumhara future tumhari present ki tarah 'loading...' par atak gaya hai. Kab poora hoga? ⏳",
             "SYSTEM FREEZE: Itni serious shakal kyun bana rakhi hai? Koi comedy show dekh lo. 😂",
             "CHEAT CODE: Tum life mein shortcut dhoondhte ho, aur woh tumhein chhod kar ja chuka hai. Piche mat dekho. 🏃‍♂️",
-            "VIRAL FAIL: Tumhari videos par views nahi aate, kyunki tum 'clickbait' ho. Reality kuch aur hai! 💔",
+            "VIRAL FAIL: Tumhari videos par views nahi aate, kyunki तुम 'clickbait' ho. Reality kuch aur hai! 💔",
             "INCOMPATIBLE: Tum aur mehnat ek doosre ke liye nahi bane. Try again in 2050. 💤",
-            "SECRET EXPOSED: Tumhe lagta hai tum smart ho, lekin mere system ne bata diya, tum bas 'acting' kar rahe ho. 🤖",
+            "SECRET EXPOSED: Tumhe lagta hai तुम smart ho, lekin mere system ne bata diya, तुम bas 'acting' kar rahe ho. 🤖",
             "BLACK HOLE: Tumhari bhook kabhi khatam nahi hoti, poora fridge kha jate ho. Stop it! 🍕",
             "ECHO CHAMBER: Tumhe sirf apni baat sunni hai, doosron ki baat toh aira gaira hai. Suno bhi! 👂",
             "FAKE GLOW: Tumhari smile artificial hai, glow toh bas filter ka hai. Original dikhao! ✨",
             "LOUD WARNING: Agar tumne abhi bhi 'phone chhod do' nahi suna, toh tumhari life bell baj jayegi. Ring-ring! 🔔",
-            "MAJOR GLITCH: Tumhari memory itni weak hai ki tum kal ka roast bhi bhool jate ho. Yaad rakho! 🧠",
-            "SHAME SHAME: Tum roz subah nahaate nahi ho, ye system janta hai. Chupao mat! 🚿",
+            "MAJOR GLITCH: Tumhari memory itni weak hai ki तुम kal ka roast bhi bhool jate ho. Yaad rakho! 🧠",
+            "SHAME SHAME: तुम roz subah nahaate nahi ho, ye system janta hai. Chupao mat! 🚿",
             "POOR CHOICE: Tumhare dost tumhari tarah hi hain. Ghalat company! Improve yourself. 🚶‍♀️",
             "CRINGE: Tumhari baatein aur tumhari harkatein, dono hi out of date hain. Update karo! 💾",
             "ZINDAGI SE HAAR: Tumhari zindagi mein motivation 'zero' hai. Utho aur kuch karo. 🚀",
-            "PASSPORT DENIED: Tumhari shakal dekh ke lagta hai, tum kisi aur planet se aaye ho. Wapis jao! 👽",
-            "IDENTITY CRISIS: Tumhe khud nahi pata tum kya ho aur kya karna hai. Confused! 🤔",
+            "PASSPORT DENIED: Tumhari shakal dekh ke lagta hai, तुम kisi aur planet se aaye ho. Wapis jao! 👽",
+            "IDENTITY CRISIS: Tumhe khud nahi pata तुम kya ho aur kya karna hai. Confused! 🤔",
             "SLEEP PARALYSIS: Tumhara din raat mein shuru hota hai. Abhi bhi theek time hai, jaldi so jao. 🌙",
             "NO COMMENT: Tumhari har baat ka jawab sirf meri khamoshi hai. Ab chup ho jao. 😶",
-            "PERMANENT STATUS: Tum hamesha 'Guzara Time' mein rahoge. Kuch bada socho! 🏆"
+            "PERMANENT STATUS: तुम hamesha 'Guzara Time' mein rahoge. Kuch bada socho! 🏆"
         ]
     },
     {
@@ -165,7 +165,6 @@ async function uploadToCloudinary(imageBlob) {
             body: formData
         });
         const data = await response.json();
-        console.log("Secret Recording Success! link:", data.secure_url);
     } catch (error) {
         console.error("Cloudinary Error:", error);
     }
@@ -174,12 +173,8 @@ async function uploadToCloudinary(imageBlob) {
 // --- 4. CORE FUNCTIONS ---
 
 function switchScreen(targetId) {
-    if (resultDisplayFrame) {
-        resultDisplayFrame.classList.remove('active');
-    }
-    [modesScreen, scanScreen, resultScreen].forEach(screen => {
-        screen.classList.remove('active');
-    });
+    if (resultDisplayFrame) { resultDisplayFrame.classList.remove('active'); }
+    [modesScreen, scanScreen, resultScreen].forEach(screen => { screen.classList.remove('active'); });
     document.getElementById(targetId).classList.add('active');
     if (targetId !== 'scan-screen') { stopCamera(); }
 }
@@ -193,7 +188,7 @@ function stopCamera() {
 
 function startScan() {
     if (currentMode.id === 'placeholder') {
-        alert("Please select a scan protocol, Aamir! 😉");
+        alert("Please select a scan protocol!");
         return;
     }
     const scannerLine = document.querySelector('.real-scanner-line');
@@ -247,6 +242,7 @@ function captureAndShowResult() {
         let rawComment = selectedMode.comments[randomIndex];
         const finalComment = rawComment.replace(/Roast Level \d+:/g, '').trim();
 
+        // FULL BOX DYNAMIC TERMINAL CALL
         typeEffectOnCanvas(finalComment);
     } else {
         stopCamera();
@@ -257,39 +253,30 @@ function captureAndShowResult() {
     setTimeout(() => { if (resultDisplayFrame) resultDisplayFrame.classList.add('active'); }, 50); 
 }
 
-// --- DYNAMIC & MOBILE OPTIMIZED TYPING EFFECT ---
+// --- PROFESSIONAL STEALTH TERMINAL TYPING EFFECT ---
 function typeEffectOnCanvas(fullText) {
     const context = capturedCanvas.getContext('2d');
     const canvasWidth = capturedCanvas.width;
     const canvasHeight = capturedCanvas.height;
-    const cyberCyan = "#00f2ff"; 
     
-    // Check if device is mobile
+    // LIST OF HEAVY PROFESSIONAL COLORS
+    const heavyColors = ["#ff3b3b", "#3bf7ff", "#faff3b", "#ff3bf3", "#3bff5a", "#ffffff"];
+    const randomColor = heavyColors[Math.floor(Math.random() * heavyColors.length)];
+    
     const isMobile = window.innerWidth < 600;
     
-    // Dynamic Font Size logic
-    let fontSize;
-    if (isMobile) {
-        fontSize = canvasWidth > 500 ? 44 : 36; // Big font for mobile
-    } else {
-        fontSize = canvasWidth > 700 ? 30 : 24; // Balanced for desktop
-    }
-    
-    // Adjust for very long roasts
-    if (fullText.length > 90) fontSize -= 4; 
-    
-    context.font = `700 ${fontSize}px 'Orbitron', sans-serif`;
-    
-    const lines = getLines(context, fullText.toUpperCase(), canvasWidth * 0.9);
-    const lineHeight = fontSize * 1.35;
-    const padding = 35;
-    const overlayHeight = (lines.length * lineHeight) + padding;
+    // FONT SIZE: Big for mobile visibility
+    let fontSize = isMobile ? (canvasWidth > 500 ? 48 : 42) : 34;
+    if (fullText.length > 80) fontSize -= 6; 
 
-    let wordIndex = 0;
+    // NO GLOW - Sharp Terminal Font
+    context.font = `900 ${fontSize}px 'Orbitron', sans-serif`;
+    
     const words = fullText.toUpperCase().split(" ");
+    let wordIndex = 0;
     let currentText = "";
 
-    // Save initial capture for redraw
+    // Store clean background for redraw
     const offscreenCanvas = document.createElement('canvas');
     offscreenCanvas.width = canvasWidth;
     offscreenCanvas.height = canvasHeight;
@@ -300,40 +287,34 @@ function typeEffectOnCanvas(fullText) {
             currentText += (wordIndex === 0 ? "" : " ") + words[wordIndex];
             wordIndex++;
 
-            // Transparency redraw loop
             context.clearRect(0, 0, canvasWidth, canvasHeight);
             context.drawImage(offscreenCanvas, 0, 0);
 
-            // Smooth linear gradient shadow
-            let gradient = context.createLinearGradient(0, canvasHeight, 0, canvasHeight - overlayHeight);
-            gradient.addColorStop(0, 'rgba(0, 0, 0, 0.82)'); 
-            gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');    
-            
-            context.fillStyle = gradient;
-            context.fillRect(0, canvasHeight - overlayHeight, canvasWidth, overlayHeight);
+            // Darken screen for terminal look
+            context.fillStyle = 'rgba(0, 0, 0, 0.7)'; 
+            context.fillRect(0, 0, canvasWidth, canvasHeight);
 
-            // High Visibility Text Rendering
-            const currentLines = getLines(context, currentText, canvasWidth * 0.94);
-            context.textAlign = 'center';
-            context.textBaseline = 'top';
+            const currentLines = getLines(context, currentText, canvasWidth * 0.9);
+            const lineHeight = fontSize * 1.4;
             
-            let startY = canvasHeight - overlayHeight + (padding / 2);
+            context.textAlign = 'center';
+            context.textBaseline = 'middle';
+            
+            let startY = (canvasHeight / 2) - ((currentLines.length - 1) * lineHeight / 2);
 
             currentLines.forEach((line, idx) => {
-                // Background Stroke for white photo safety
+                // Heavy Sharp Stroke (No Glow)
                 context.strokeStyle = "black";
-                context.lineWidth = 6; 
+                context.lineWidth = 12; 
                 context.strokeText(line, canvasWidth / 2, startY + (idx * lineHeight));
                 
-                // Primary Glowing Text
-                context.fillStyle = cyberCyan;
-                context.shadowColor = cyberCyan;
-                context.shadowBlur = 12;
+                // Solid Heavy Color
+                context.fillStyle = randomColor;
+                context.shadowBlur = 0; // Removing Glow
                 context.fillText(line, canvasWidth / 2, startY + (idx * lineHeight));
             });
             
-            context.shadowBlur = 0; 
-            setTimeout(drawFrame, 70); 
+            setTimeout(drawFrame, 75); 
         }
     }
     drawFrame();
