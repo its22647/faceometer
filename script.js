@@ -55,7 +55,7 @@ const modes = [
             "REALITY CHECK: Tumhara bank balance aur tumhari akal dono hi 'critical low' par hain. 📉",
             "SCAM ALERT: Tumhari promise aur tumhari neend, dono pe bharosa nahi kiya ja sakta. Jhoote! 🤥",
             "CPU USAGE: Tumhara dimagh itna slow chalta hai ki 2G internet bhi tumse tez hai. 🐌",
-            "INVESTIGATION: Tumhari shakal dekh ke lagta hai, jaise तुम roz subah uth ke doosron ki khushiyan churane nikle ho. 🔪",
+            "INVESTIGATION: Tumhari shakal dekh ke lagta hai, jaise tum roz subah uth ke doosron ki khushiyan churane nikle ho. 🔪",
             "DESIGN FLAW: Tumhari personality mein koi 'wow' factor nahi hai, bas default settings hain. Boring! 😐",
             "SERVER DOWN: Jab tum baat karte ho, puri mehfil mute ho jaati hai. Please, no thanks! 🔇",
             "OBSERVATION: Tumhari energy sirf 'bakwas' aur 'overacting' mein kharch hoti hai. Wapis le lo! 🎭",
@@ -247,7 +247,6 @@ function captureAndShowResult() {
         let rawComment = selectedMode.comments[randomIndex];
         const finalComment = rawComment.replace(/Roast Level \d+:/g, '').trim();
 
-        // 100% Dynamic Transparency call
         typeEffectOnCanvas(finalComment);
     } else {
         stopCamera();
@@ -258,29 +257,39 @@ function captureAndShowResult() {
     setTimeout(() => { if (resultDisplayFrame) resultDisplayFrame.classList.add('active'); }, 50); 
 }
 
-// --- FULLY TRANSPARENT DYNAMIC TYPING EFFECT ---
+// --- DYNAMIC & MOBILE OPTIMIZED TYPING EFFECT ---
 function typeEffectOnCanvas(fullText) {
     const context = capturedCanvas.getContext('2d');
     const canvasWidth = capturedCanvas.width;
     const canvasHeight = capturedCanvas.height;
-    
     const cyberCyan = "#00f2ff"; 
     
-    let fontSize = canvasWidth > 700 ? 28 : (canvasWidth > 500 ? 22 : 18); 
-    if (fullText.length > 80) fontSize -= 4; 
+    // Check if device is mobile
+    const isMobile = window.innerWidth < 600;
+    
+    // Dynamic Font Size logic
+    let fontSize;
+    if (isMobile) {
+        fontSize = canvasWidth > 500 ? 44 : 36; // Big font for mobile
+    } else {
+        fontSize = canvasWidth > 700 ? 30 : 24; // Balanced for desktop
+    }
+    
+    // Adjust for very long roasts
+    if (fullText.length > 90) fontSize -= 4; 
     
     context.font = `700 ${fontSize}px 'Orbitron', sans-serif`;
     
-    const lines = getLines(context, fullText.toUpperCase(), canvasWidth * 0.85);
-    const lineHeight = fontSize * 1.4;
-    const padding = 30;
+    const lines = getLines(context, fullText.toUpperCase(), canvasWidth * 0.9);
+    const lineHeight = fontSize * 1.35;
+    const padding = 35;
     const overlayHeight = (lines.length * lineHeight) + padding;
 
     let wordIndex = 0;
     const words = fullText.toUpperCase().split(" ");
     let currentText = "";
 
-    // Save initial clean photo to redraw in loop
+    // Save initial capture for redraw
     const offscreenCanvas = document.createElement('canvas');
     offscreenCanvas.width = canvasWidth;
     offscreenCanvas.height = canvasHeight;
@@ -291,35 +300,32 @@ function typeEffectOnCanvas(fullText) {
             currentText += (wordIndex === 0 ? "" : " ") + words[wordIndex];
             wordIndex++;
 
-            // --- 1. THE TRANSPARENCY FIX ---
-            // Clear area and restore photo first
+            // Transparency redraw loop
             context.clearRect(0, 0, canvasWidth, canvasHeight);
             context.drawImage(offscreenCanvas, 0, 0);
 
-            // Create linear fade instead of black box
+            // Smooth linear gradient shadow
             let gradient = context.createLinearGradient(0, canvasHeight, 0, canvasHeight - overlayHeight);
-            gradient.addColorStop(0, 'rgba(0, 0, 0, 0.75)'); // Darkest at bottom
-            gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');    // Fully transparent at top
+            gradient.addColorStop(0, 'rgba(0, 0, 0, 0.82)'); 
+            gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');    
             
             context.fillStyle = gradient;
             context.fillRect(0, canvasHeight - overlayHeight, canvasWidth, overlayHeight);
 
-            // --- 2. HIGH-VISIBILITY TEXT ---
-            const currentLines = getLines(context, currentText, canvasWidth * 0.9);
+            // High Visibility Text Rendering
+            const currentLines = getLines(context, currentText, canvasWidth * 0.94);
             context.textAlign = 'center';
             context.textBaseline = 'top';
             
             let startY = canvasHeight - overlayHeight + (padding / 2);
 
             currentLines.forEach((line, idx) => {
-                // Triple visibility: Shadow + Stroke + Glow
-                context.shadowColor = "rgba(0,0,0,0.9)";
-                context.shadowBlur = 10;
-                
+                // Background Stroke for white photo safety
                 context.strokeStyle = "black";
-                context.lineWidth = 5;
+                context.lineWidth = 6; 
                 context.strokeText(line, canvasWidth / 2, startY + (idx * lineHeight));
                 
+                // Primary Glowing Text
                 context.fillStyle = cyberCyan;
                 context.shadowColor = cyberCyan;
                 context.shadowBlur = 12;
@@ -327,7 +333,7 @@ function typeEffectOnCanvas(fullText) {
             });
             
             context.shadowBlur = 0; 
-            setTimeout(drawFrame, 75); 
+            setTimeout(drawFrame, 70); 
         }
     }
     drawFrame();
