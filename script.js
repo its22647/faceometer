@@ -93,12 +93,11 @@ const modes = [
         name: '💣 Ultimate Destroyer (One-Word Kill Shots)',
         styleClass: 'destroyer-style',
         comments: [
-            "FAIL", "MAD", "DULL", "GADHE KAHIN K", "EMPTY", 
-            "USELESS", "SAD", "SCARED", "PAGAL", "DUMB",
-            "LAZY", "LIAR", "GHOST", "DREAMER", "STRESS", 
-            "BROKE", "SINK", "SLEEPY", "SLOW", "CRAZY",
-            "CRY", "WEAK", "CLUMSY", "OLD", "RUN",
-            "FINISHED", "LATE", "BEWAQOOF", "WASTED", "LAZY"
+            "FAIL", "MAD", "Donkey", "GADHE KAHIN K", "Monkey", 
+            "Bekar Admi", "Ullu kahin k", "PAGAL", "Khusra 😂",
+            "LAZY", "Bhoot", "STRESS", "BROKE", "SINK", 
+            "SLEEPY", "SLOW", "CRAZY", "Faltu Banda", "Chal hat",
+            "Shaitan", "Gadhi kahin ki", "BEWAQOOF", "Sust Insan", "LAZY"
         ]
     }
 ];
