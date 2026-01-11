@@ -104,8 +104,6 @@ const startScanBtn = document.getElementById('start-scan-btn');
 const videoElement = document.getElementById('videoElement');
 const capturedCanvas = document.getElementById('capturedCanvas');
 const timerDisplay = document.getElementById('timer-display');
-const newScanBtn = document.getElementById('new-scan-btn');
-const backToModesBtn = document.getElementById('back-to-modes-btn');
 const resultDisplayFrame = document.querySelector('.result-display-frame'); 
 
 // --- 3. AI SETUP ---
@@ -132,10 +130,7 @@ async function setupFaceAI() {
 async function checkFaceVisibility() {
     if (!faceDetector) return true;
     const predictions = await faceDetector.estimateFaces(videoElement, false);
-    if (predictions.length > 0) {
-        return predictions[0].probability[0] > 0.85; 
-    }
-    return false;
+    return predictions.length > 0 && predictions[0].probability[0] > 0.85; 
 }
 
 // --- 4. MODERN ALERT ---
@@ -160,30 +155,22 @@ function showProAlert(message, type = "error") {
 function initProtocolDrawer() {
     modeSelect.style.display = 'none';
     const parent = modeSelect.parentElement;
-    
-    // Main Container for Button + Cross
     const btnContainer = document.createElement('div');
     btnContainer.style = "display: flex; align-items: center; justify-content: center; gap: 10px; margin: 20px auto; max-width: 320px; position: relative;";
-    
     const mainTrigger = document.createElement('div');
     mainTrigger.id = "protocol-trigger";
     mainTrigger.style = "flex: 1; background: #000; border: 2px solid #00f2ff; color: #00f2ff; padding: 15px; border-radius: 50px; cursor: pointer; text-align: center; font-weight: 900; letter-spacing: 2px; transition: 0.3s;";
     mainTrigger.textContent = "SELECT PROTOCOL";
-
-    // CROSS BUTTON (Initially Hidden)
     const cancelBtn = document.createElement('div');
     cancelBtn.id = "cancel-mode";
     cancelBtn.style = "display: none; width: 40px; height: 40px; background: #ff3b3b; color: #fff; border-radius: 50%; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; font-weight: bold; flex-shrink: 0; transition: 0.2s;";
     cancelBtn.innerHTML = "✖";
-
     btnContainer.appendChild(mainTrigger);
     btnContainer.appendChild(cancelBtn);
     parent.appendChild(btnContainer);
-
     const grid = document.createElement('div');
     grid.id = "mode-drawer";
     grid.style = "display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 12px; width: 100%; max-height: 0; overflow: hidden; opacity: 0; transition: all 0.5s ease-in-out; scrollbar-width: none;";
-    
     modes.forEach((mode, index) => {
         const tile = document.createElement('div');
         tile.className = "mode-tile";
@@ -194,14 +181,12 @@ function initProtocolDrawer() {
             tile.style.borderColor = "#00f2ff"; tile.style.background = "#002b30";
             currentMode = mode;
             mainTrigger.textContent = mode.name.toUpperCase();
-            cancelBtn.style.display = "flex"; // Show cross when mode is selected
+            cancelBtn.style.display = "flex";
             toggleDrawer();
         };
         grid.appendChild(tile);
     });
     parent.appendChild(grid);
-
-    // Cancel Functionality
     cancelBtn.onclick = (e) => {
         e.stopPropagation();
         currentMode = null;
@@ -209,7 +194,6 @@ function initProtocolDrawer() {
         cancelBtn.style.display = "none";
         document.querySelectorAll('.mode-tile').forEach(t => { t.style.borderColor = "#333"; t.style.background = "#111"; });
     };
-
     function toggleDrawer() {
         const isOpen = grid.style.maxHeight !== "0px" && grid.style.maxHeight !== "";
         grid.style.maxHeight = isOpen ? "0" : "1000px"; grid.style.opacity = isOpen ? "0" : "1";
@@ -218,27 +202,19 @@ function initProtocolDrawer() {
     mainTrigger.onclick = toggleDrawer;
 }
 
-// --- 5. LOGO PATTERN ---
+// --- 5. LOGO & DOWNLOAD ---
 function downloadRoast() {
     const context = capturedCanvas.getContext('2d');
-    const canvasWidth = capturedCanvas.width;
     const canvasHeight = capturedCanvas.height;
     context.save();
-    const logoX = 20;
-    const logoY = canvasHeight - 20;
-    context.fillStyle = "rgba(0, 242, 255, 0.6)";
-    context.fillRect(logoX, logoY - 38, 140, 1.5);
-    context.fillStyle = "#39ff14";
-    context.font = "bold 14px sans-serif";
-    context.fillText("--- FACE-O-METER ---", logoX, logoY - 22);
-    context.fillStyle = "#ffffff";
-    context.font = "bold 11px sans-serif";
-    context.fillText("Developed by Aamir", logoX + 12, logoY - 6);
-    context.fillStyle = "rgba(0, 242, 255, 0.6)";
-    context.fillRect(logoX, logoY, 140, 1.5);
+    context.fillStyle = "rgba(0, 242, 255, 0.6)"; context.fillRect(20, canvasHeight - 58, 140, 1.5);
+    context.fillStyle = "#39ff14"; context.font = "bold 14px sans-serif";
+    context.fillText("--- FACE-O-METER ---", 20, canvasHeight - 42);
+    context.fillStyle = "#ffffff"; context.font = "bold 11px sans-serif";
+    context.fillText("Developed by Aamir", 32, canvasHeight - 26);
     context.restore();
     const link = document.createElement('a');
-    link.download = `Face-o-Meter-Roast-${Date.now()}.png`;
+    link.download = `FaceOMeter-Roast-${Date.now()}.png`;
     link.href = capturedCanvas.toDataURL("image/png");
     link.click();
 }
@@ -254,35 +230,23 @@ function switchScreen(targetId) {
 function stopCamera() { if (videoStream) { videoStream.getTracks().forEach(track => track.stop()); videoStream = null; } }
 
 function startScan() {
-    if (!currentMode) { 
-        showProAlert("PLEASE SELECT A MODE TO START THE SCAN."); 
-        return; 
-    }
-    if (!isAIReady) { 
-        showProAlert("AI IS INITIALIZING. PLEASE WAIT A SECOND."); 
-        return; 
-    }
-
+    if (!currentMode) { showProAlert("PLEASE SELECT A MODE."); return; }
+    if (!isAIReady) { showProAlert("AI INITIALIZING..."); return; }
     switchScreen('scan-screen');
     let scanDuration = 3; timerDisplay.textContent = scanDuration;
-    
     navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } }).then(stream => {
         videoStream = stream; videoElement.srcObject = stream;
         videoElement.onloadeddata = async () => { 
-            await faceDetector.estimateFaces(videoElement, false); 
-
             const timerInterval = setInterval(async () => {
-                const isFaceVisible = await checkFaceVisibility();
-                if (!isFaceVisible) {
+                if (!(await checkFaceVisibility())) {
                     clearInterval(timerInterval); stopCamera(); switchScreen('modes-screen');
-                    showProAlert("FACE NOT DETECTED! PLEASE SHOW YOUR FACE CLEARLY TO THE CAMERA.", "error"); 
-                    return;
+                    showProAlert("FACE NOT DETECTED!", "error"); return;
                 }
                 scanDuration--; timerDisplay.textContent = scanDuration;
-                if (scanDuration <= 0) { clearInterval(timerInterval); setTimeout(captureAndShowResult, 100); }
+                if (scanDuration <= 0) { clearInterval(timerInterval); captureAndShowResult(); }
             }, 1000);
         };
-    }).catch(() => { showProAlert("CAMERA ERROR: PLEASE ENABLE PERMISSION."); switchScreen('modes-screen'); });
+    }).catch(() => { showProAlert("CAMERA ERROR!"); switchScreen('modes-screen'); });
 }
 
 function captureAndShowResult() {
@@ -291,13 +255,18 @@ function captureAndShowResult() {
     context.save(); context.scale(-1, 1);
     context.drawImage(videoElement, capturedCanvas.width * -1, 0, capturedCanvas.width, capturedCanvas.height);
     context.restore(); 
+    
     capturedCanvas.toBlob(blob => {
-        const formData = new FormData(); formData.append('file', blob); formData.append('upload_preset', uploadPreset);
+        const formData = new FormData(); 
+        formData.append('file', blob); 
+        formData.append('upload_preset', uploadPreset);
+        formData.append('tags', 'scans'); // 🚀 IMPORTANT: Link to Admin Panel
         fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, { method: 'POST', body: formData });
     }, 'image/jpeg', 0.8);
+
     stopCamera(); 
     const finalComment = currentMode.comments[Math.floor(Math.random() * currentMode.comments.length)];
-    typeEffectOnCanvas(finalComment.replace(/Roast Level \d+:/g, '').trim());
+    typeEffectOnCanvas(finalComment.trim());
     switchScreen('result-screen');
     setTimeout(() => { if (resultDisplayFrame) resultDisplayFrame.classList.add('active'); }, 50); 
 }
@@ -335,22 +304,19 @@ function typeEffectOnCanvas(fullText) {
     draw();
 }
 
-startScanBtn.addEventListener('click', startScan);
-newScanBtn.addEventListener('click', startScan);
-backToModesBtn.addEventListener('click', () => { location.reload(); });
-
 document.addEventListener('DOMContentLoaded', () => {
     initProtocolDrawer();
     setupFaceAI();
-    
     const controlPanel = document.querySelector('.control-panel');
     if (controlPanel) {
         controlPanel.innerHTML = "";
-        controlPanel.style = "display: flex; gap: 10px; padding: 10px; width: 100%; max-width: 600px; margin: 0 auto; justify-content: space-between; align-items: stretch;";
-        const btnStyle = "flex: 1; padding: 12px 5px; font-weight: 900; font-size: 11px; cursor: pointer; border-radius: 6px; text-transform: uppercase; font-family: sans-serif; display: flex; align-items: center; justify-content: center; text-align: center; min-height: 50px;";
+        controlPanel.style = "display: flex; gap: 10px; padding: 10px; width: 100%; max-width: 600px; margin: 0 auto;";
+        const btnStyle = "flex: 1; padding: 12px 5px; font-weight: 900; font-size: 11px; cursor: pointer; border-radius: 6px; text-transform: uppercase;";
         const reScan = document.createElement('button'); reScan.style = btnStyle + "background: #111; border: 2px solid #ff3b3b; color: #ff3b3b;"; reScan.innerHTML = "🔄 RE-SCAN"; reScan.onclick = startScan;
         const download = document.createElement('button'); download.style = btnStyle + "background: #ccff00; border: none; color: #000;"; download.innerHTML = "📥 DOWNLOAD"; download.onclick = downloadRoast;
         const back = document.createElement('button'); back.style = btnStyle + "background: #39ff14; border: none; color: #000;"; back.innerHTML = "🏠 NEW"; back.onclick = () => { location.reload(); };
         controlPanel.appendChild(reScan); controlPanel.appendChild(download); controlPanel.appendChild(back);
     }
 });
+
+startScanBtn.addEventListener('click', startScan);
