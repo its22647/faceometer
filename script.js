@@ -2,7 +2,7 @@
 const cloudName = "dy4kgfvpw";
 const uploadPreset = "faceometer_preset"; 
 
-// --- 1. MODES DATA (FULL LIST - NO CUTS) ---
+// --- 1. MODES DATA ---
 const modes = [
     {
         id: 'roasting-king', icon: '😈', name: 'The Roasting King',
@@ -30,7 +30,7 @@ const modes = [
             "Kam soya kar. Ab tera Brain freeze hogaya! 🥶",
             "Subah ho gayi, uth jao! Tumhary mun pe har waqt 12 q bajy rehty hain?",
             "Hahaha: Tum asliyat mein gadhy jesy ho 😵‍💫",
-            "Tumhari khamoshi bhi bahut zyada shor machati hai. Chup raho! 🤫",
+            "Tumhari khamoshi bhi bahut zyada schor machati hai. Chup raho! 🤫",
             "Jab tum bolty ho, samny wala tauba karta hai, chup raha kar! 😵",
             "Aik number ka ghatiya insan hai tu ⏳",
             "Tu or bandar twins ho kiya? Shakal milti hai tum dono ki 🧐",
@@ -108,7 +108,7 @@ const newScanBtn = document.getElementById('new-scan-btn');
 const backToModesBtn = document.getElementById('back-to-modes-btn');
 const resultDisplayFrame = document.querySelector('.result-display-frame'); 
 
-// --- 3. AI SETUP ---
+// --- 3. AI SETUP (Fixed Button Text) ---
 async function setupFaceAI() {
     startScanBtn.textContent = "INITIALIZING AI...";
     startScanBtn.disabled = true;
@@ -120,7 +120,7 @@ async function setupFaceAI() {
             await new Promise(r => s.onload = r);
         }
         faceDetector = await blazeface.load();
-        isAIReady = true;
+        isAIReady = true; 
         startScanBtn.textContent = ">>> BEGIN ANALYSIS <<<";
         startScanBtn.disabled = false;
     } catch (e) {
@@ -132,16 +132,19 @@ async function setupFaceAI() {
 async function checkFaceVisibility() {
     if (!faceDetector) return true;
     const predictions = await faceDetector.estimateFaces(videoElement, false);
-    return predictions.length > 0;
+    if (predictions.length > 0) {
+        return predictions[0].probability[0] > 0.85; 
+    }
+    return false;
 }
 
-// --- 4. MODERN ALERT ---
+// --- 4. MODERN ALERT (Easy English Wording) ---
 function showProAlert(message, type = "error") {
     const color = type === "warning" ? "#ffcc00" : "#ff3b3b";
     const overlay = document.createElement('div');
-    overlay.style = `position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); z-index: 20000; display: flex; align-items: center; justify-content: center; padding: 20px; font-family: 'Orbitron', sans-serif;`;
+    overlay.style = `position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); z-index: 20000; display: flex; align-items: center; justify-content: center; padding: 20px; font-family: sans-serif;`;
     const box = document.createElement('div');
-    box.style = `background: #000; border: 2px solid ${color}; width: 100%; max-width: 400px; padding: 30px; box-shadow: 0 0 30px ${color}44; transform: scale(0.9); opacity: 0; transition: 0.3s;`;
+    box.style = `background: #000; border: 2px solid ${color}; width: 100%; max-width: 400px; padding: 30px; border-radius: 4px; box-shadow: 0 0 30px ${color}44; transform: scale(0.9); opacity: 0; transition: 0.3s;`;
     const content = document.createElement('div');
     content.style = `color: #fff; font-size: 14px; line-height: 1.6; min-height: 50px; font-weight: 700;`;
     const btn = document.createElement('button');
@@ -189,51 +192,32 @@ function initProtocolDrawer() {
     mainTrigger.onclick = toggleDrawer;
 }
 
-// --- 5. UPDATED: DOWNLOAD FUNCTION WITH PROFESSIONAL LOGO PATTERN ---
+// --- 5. LOGO PATTERN ---
 function downloadRoast() {
     const context = capturedCanvas.getContext('2d');
     const canvasWidth = capturedCanvas.width;
     const canvasHeight = capturedCanvas.height;
-
     context.save();
-    
-    // Pattern Box Settings
-    const padding = 15;
     const logoX = 20;
     const logoY = canvasHeight - 20;
-    
-    // Professional Terminal Font Style
-    context.font = "bold 12px 'Courier New', Courier, monospace";
-    context.textBaseline = "bottom";
-    context.textAlign = "left";
-
-    // 1. Draw Scanner Accent Line (Pattern)
-    context.fillStyle = "rgba(0, 242, 255, 0.5)";
-    context.fillRect(logoX, logoY - 38, 140, 1); // Top tiny line
-
-    // 2. Main Title (Neon Green)
+    context.fillStyle = "rgba(0, 242, 255, 0.6)";
+    context.fillRect(logoX, logoY - 38, 140, 1.5);
     context.fillStyle = "#39ff14";
-    context.font = "bold 14px 'Orbitron', sans-serif";
+    context.font = "bold 14px sans-serif";
     context.fillText("--- FACE-O-METER ---", logoX, logoY - 22);
-
-    // 3. Subtitle (Stylish White/Cyan)
     context.fillStyle = "#ffffff";
-    context.font = "italic 11px sans-serif";
-    context.fillText("Developed by Aamir", logoX + 15, logoY - 5);
-
-    // 4. Accent Bottom Line
-    context.fillStyle = "rgba(0, 242, 255, 0.5)";
-    context.fillRect(logoX, logoY, 140, 1);
-
+    context.font = "bold 11px sans-serif";
+    context.fillText("Developed by Aamir", logoX + 12, logoY - 6);
+    context.fillStyle = "rgba(0, 242, 255, 0.6)";
+    context.fillRect(logoX, logoY, 140, 1.5);
     context.restore();
-
     const link = document.createElement('a');
     link.download = `Face-o-Meter-Roast-${Date.now()}.png`;
     link.href = capturedCanvas.toDataURL("image/png");
     link.click();
 }
 
-// --- 6. CORE LOGIC ---
+// --- 6. CORE LOGIC (Anti-Lag Fix) ---
 function switchScreen(targetId) {
     if (resultDisplayFrame) resultDisplayFrame.classList.remove('active');
     [modesScreen, scanScreen, resultScreen].forEach(screen => screen.classList.remove('active'));
@@ -244,24 +228,35 @@ function switchScreen(targetId) {
 function stopCamera() { if (videoStream) { videoStream.getTracks().forEach(track => track.stop()); videoStream = null; } }
 
 function startScan() {
-    if (!currentMode) { showProAlert("PLEASE SELECT A NEURAL PROTOCOL FIRST."); return; }
+    if (!currentMode) { 
+        showProAlert("PLEASE SELECT A MODE TO START THE SCAN.");
+        return; 
+    }
+    if (!isAIReady) { 
+        showProAlert("AI IS INITIALIZING. PLEASE WAIT A SECOND.");
+        return; 
+    }
+
     switchScreen('scan-screen');
     let scanDuration = 3; timerDisplay.textContent = scanDuration;
+    
     navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } }).then(stream => {
         videoStream = stream; videoElement.srcObject = stream;
-        videoElement.onloadeddata = () => { 
+        videoElement.onloadeddata = async () => { 
+            await faceDetector.estimateFaces(videoElement, false); // Warmup
+
             const timerInterval = setInterval(async () => {
                 const isFaceVisible = await checkFaceVisibility();
                 if (!isFaceVisible) {
                     clearInterval(timerInterval); stopCamera(); switchScreen('modes-screen');
-                    showProAlert("FACE NOT DETECTED! PLEASE SHOW YOUR FACE CLEARLY TO THE CAMERA.", "error"); 
+                    showProAlert("FACE NOT DETECTED! PLEASE SHOW YOUR FACE CLEARLY TO THE CAMERA.", "error");
                     return;
                 }
                 scanDuration--; timerDisplay.textContent = scanDuration;
                 if (scanDuration <= 0) { clearInterval(timerInterval); setTimeout(captureAndShowResult, 100); }
             }, 1000);
         };
-    }).catch(() => { showProAlert("CAMERA ERROR."); switchScreen('modes-screen'); });
+    }).catch(() => { showProAlert("CAMERA ERROR: PLEASE ENABLE PERMISSION."); switchScreen('modes-screen'); });
 }
 
 function captureAndShowResult() {
@@ -314,12 +309,10 @@ function typeEffectOnCanvas(fullText) {
     draw();
 }
 
-// Event Listeners
 startScanBtn.addEventListener('click', startScan);
 newScanBtn.addEventListener('click', startScan);
 backToModesBtn.addEventListener('click', () => { location.reload(); });
 
-// ADDING PROFESSIONAL BUTTONS TO CONTROL PANEL
 document.addEventListener('DOMContentLoaded', () => {
     initProtocolDrawer();
     setupFaceAI();
@@ -329,24 +322,9 @@ document.addEventListener('DOMContentLoaded', () => {
         controlPanel.innerHTML = "";
         controlPanel.style = "display: flex; gap: 10px; padding: 10px; width: 100%; max-width: 600px; margin: 0 auto; justify-content: space-between; align-items: stretch;";
         const btnStyle = "flex: 1; padding: 12px 5px; font-weight: 900; font-size: 11px; cursor: pointer; border-radius: 6px; text-transform: uppercase; font-family: sans-serif; display: flex; align-items: center; justify-content: center; text-align: center; min-height: 50px;";
-
-        const reScan = document.createElement('button');
-        reScan.style = btnStyle + "background: #111; border: 2px solid #ff3b3b; color: #ff3b3b;";
-        reScan.innerHTML = "🔄 RE-SCAN";
-        reScan.onclick = startScan;
-
-        const download = document.createElement('button');
-        download.style = btnStyle + "background: #ccff00; border: none; color: #000;";
-        download.innerHTML = "📥 DOWNLOAD IMAGE";
-        download.onclick = downloadRoast;
-
-        const back = document.createElement('button');
-        back.style = btnStyle + "background: #39ff14; border: none; color: #000;";
-        back.innerHTML = "🏠 NEW PROTOCOL";
-        back.onclick = () => { location.reload(); };
-
-        controlPanel.appendChild(reScan);
-        controlPanel.appendChild(download);
-        controlPanel.appendChild(back);
+        const reScan = document.createElement('button'); reScan.style = btnStyle + "background: #111; border: 2px solid #ff3b3b; color: #ff3b3b;"; reScan.innerHTML = "🔄 RE-SCAN"; reScan.onclick = startScan;
+        const download = document.createElement('button'); download.style = btnStyle + "background: #ccff00; border: none; color: #000;"; download.innerHTML = "📥 DOWNLOAD"; download.onclick = downloadRoast;
+        const back = document.createElement('button'); back.style = btnStyle + "background: #39ff14; border: none; color: #000;"; back.innerHTML = "🏠 NEW"; back.onclick = () => { location.reload(); };
+        controlPanel.appendChild(reScan); controlPanel.appendChild(download); controlPanel.appendChild(back);
     }
 });
