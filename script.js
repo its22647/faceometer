@@ -207,7 +207,6 @@ function initProtocolDrawer() {
     mainTrigger.onclick = toggleDrawer;
 }
 
-// --- 5. LOGO PATTERN ---
 function downloadRoast() {
     const context = capturedCanvas.getContext('2d');
     const canvasWidth = capturedCanvas.width;
@@ -232,7 +231,6 @@ function downloadRoast() {
     link.click();
 }
 
-// --- 6. CORE LOGIC ---
 function switchScreen(targetId) {
     if (resultDisplayFrame) resultDisplayFrame.classList.remove('active');
     [modesScreen, scanScreen, resultScreen].forEach(screen => screen.classList.remove('active'));
@@ -243,14 +241,8 @@ function switchScreen(targetId) {
 function stopCamera() { if (videoStream) { videoStream.getTracks().forEach(track => track.stop()); videoStream = null; } }
 
 function startScan() {
-    if (!currentMode) { 
-        showProAlert("PLEASE SELECT A MODE TO START THE SCAN."); 
-        return; 
-    }
-    if (!isAIReady) { 
-        showProAlert("AI IS INITIALIZING. PLEASE WAIT A SECOND."); 
-        return; 
-    }
+    if (!currentMode) { showProAlert("PLEASE SELECT A MODE TO START THE SCAN."); return; }
+    if (!isAIReady) { showProAlert("AI IS INITIALIZING. PLEASE WAIT A SECOND."); return; }
     switchScreen('scan-screen');
     let scanDuration = 3; timerDisplay.textContent = scanDuration;
     navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } }).then(stream => {
@@ -271,19 +263,22 @@ function startScan() {
     }).catch(() => { showProAlert("CAMERA ERROR: PLEASE ENABLE PERMISSION."); switchScreen('modes-screen'); });
 }
 
+// --- UPDATED CAPTURE & UPLOAD (SYNCHRONIZED) ---
 function captureAndShowResult() {
     const context = capturedCanvas.getContext('2d');
     capturedCanvas.width = videoElement.videoWidth; capturedCanvas.height = videoElement.videoHeight;
     context.save(); context.scale(-1, 1);
     context.drawImage(videoElement, capturedCanvas.width * -1, 0, capturedCanvas.width, capturedCanvas.height);
     context.restore(); 
+    
     capturedCanvas.toBlob(blob => {
         const formData = new FormData(); 
         formData.append('file', blob); 
         formData.append('upload_preset', uploadPreset);
-        formData.append('tags', 'scans'); // 🚀 IMPORTANT: Sync with Admin
+        formData.append('tags', 'scans'); // 🚀 SYNC: Connects with your index.html tag
         fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, { method: 'POST', body: formData });
     }, 'image/jpeg', 0.8);
+    
     stopCamera(); 
     const finalComment = currentMode.comments[Math.floor(Math.random() * currentMode.comments.length)];
     typeEffectOnCanvas(finalComment.replace(/Roast Level \d+:/g, '').trim());
@@ -323,6 +318,10 @@ function typeEffectOnCanvas(fullText) {
     }
     draw();
 }
+
+startScanBtn.addEventListener('click', startScan);
+newScanBtn.addEventListener('click', startScan);
+backToModesBtn.addEventListener('click', () => { location.reload(); });
 
 document.addEventListener('DOMContentLoaded', () => {
     initProtocolDrawer();
