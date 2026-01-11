@@ -108,7 +108,7 @@ const newScanBtn = document.getElementById('new-scan-btn');
 const backToModesBtn = document.getElementById('back-to-modes-btn');
 const resultDisplayFrame = document.querySelector('.result-display-frame'); 
 
-// --- 3. AI SETUP (Fixed Button Text) ---
+// --- 3. AI SETUP ---
 async function setupFaceAI() {
     startScanBtn.textContent = "INITIALIZING AI...";
     startScanBtn.disabled = true;
@@ -138,7 +138,7 @@ async function checkFaceVisibility() {
     return false;
 }
 
-// --- 4. MODERN ALERT (Easy English Wording) ---
+// --- 4. MODERN ALERT ---
 function showProAlert(message, type = "error") {
     const color = type === "warning" ? "#ffcc00" : "#ff3b3b";
     const overlay = document.createElement('div');
@@ -160,11 +160,25 @@ function showProAlert(message, type = "error") {
 function initProtocolDrawer() {
     modeSelect.style.display = 'none';
     const parent = modeSelect.parentElement;
+    
+    // Main Container for Button + Cross
+    const btnContainer = document.createElement('div');
+    btnContainer.style = "display: flex; align-items: center; justify-content: center; gap: 10px; margin: 20px auto; max-width: 320px; position: relative;";
+    
     const mainTrigger = document.createElement('div');
     mainTrigger.id = "protocol-trigger";
-    mainTrigger.style = "background: #000; border: 2px solid #00f2ff; color: #00f2ff; padding: 15px; border-radius: 50px; cursor: pointer; text-align: center; font-weight: 900; letter-spacing: 2px; margin: 20px auto; max-width: 280px;";
+    mainTrigger.style = "flex: 1; background: #000; border: 2px solid #00f2ff; color: #00f2ff; padding: 15px; border-radius: 50px; cursor: pointer; text-align: center; font-weight: 900; letter-spacing: 2px; transition: 0.3s;";
     mainTrigger.textContent = "SELECT PROTOCOL";
-    parent.appendChild(mainTrigger);
+
+    // CROSS BUTTON (Initially Hidden)
+    const cancelBtn = document.createElement('div');
+    cancelBtn.id = "cancel-mode";
+    cancelBtn.style = "display: none; width: 40px; height: 40px; background: #ff3b3b; color: #fff; border-radius: 50%; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; font-weight: bold; flex-shrink: 0; transition: 0.2s;";
+    cancelBtn.innerHTML = "✖";
+
+    btnContainer.appendChild(mainTrigger);
+    btnContainer.appendChild(cancelBtn);
+    parent.appendChild(btnContainer);
 
     const grid = document.createElement('div');
     grid.id = "mode-drawer";
@@ -178,11 +192,23 @@ function initProtocolDrawer() {
         tile.onclick = () => {
             document.querySelectorAll('.mode-tile').forEach(t => { t.style.borderColor = "#333"; t.style.background = "#111"; });
             tile.style.borderColor = "#00f2ff"; tile.style.background = "#002b30";
-            currentMode = mode; mainTrigger.textContent = mode.name.toUpperCase(); toggleDrawer();
+            currentMode = mode;
+            mainTrigger.textContent = mode.name.toUpperCase();
+            cancelBtn.style.display = "flex"; // Show cross when mode is selected
+            toggleDrawer();
         };
         grid.appendChild(tile);
     });
     parent.appendChild(grid);
+
+    // Cancel Functionality
+    cancelBtn.onclick = (e) => {
+        e.stopPropagation();
+        currentMode = null;
+        mainTrigger.textContent = "SELECT PROTOCOL";
+        cancelBtn.style.display = "none";
+        document.querySelectorAll('.mode-tile').forEach(t => { t.style.borderColor = "#333"; t.style.background = "#111"; });
+    };
 
     function toggleDrawer() {
         const isOpen = grid.style.maxHeight !== "0px" && grid.style.maxHeight !== "";
@@ -217,7 +243,7 @@ function downloadRoast() {
     link.click();
 }
 
-// --- 6. CORE LOGIC (Anti-Lag Fix) ---
+// --- 6. CORE LOGIC ---
 function switchScreen(targetId) {
     if (resultDisplayFrame) resultDisplayFrame.classList.remove('active');
     [modesScreen, scanScreen, resultScreen].forEach(screen => screen.classList.remove('active'));
@@ -229,11 +255,11 @@ function stopCamera() { if (videoStream) { videoStream.getTracks().forEach(track
 
 function startScan() {
     if (!currentMode) { 
-        showProAlert("PLEASE SELECT A MODE TO START THE SCAN.");
+        showProAlert("PLEASE SELECT A MODE TO START THE SCAN."); 
         return; 
     }
     if (!isAIReady) { 
-        showProAlert("AI IS INITIALIZING. PLEASE WAIT A SECOND.");
+        showProAlert("AI IS INITIALIZING. PLEASE WAIT A SECOND."); 
         return; 
     }
 
@@ -243,13 +269,13 @@ function startScan() {
     navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } }).then(stream => {
         videoStream = stream; videoElement.srcObject = stream;
         videoElement.onloadeddata = async () => { 
-            await faceDetector.estimateFaces(videoElement, false); // Warmup
+            await faceDetector.estimateFaces(videoElement, false); 
 
             const timerInterval = setInterval(async () => {
                 const isFaceVisible = await checkFaceVisibility();
                 if (!isFaceVisible) {
                     clearInterval(timerInterval); stopCamera(); switchScreen('modes-screen');
-                    showProAlert("FACE NOT DETECTED! PLEASE SHOW YOUR FACE CLEARLY TO THE CAMERA.", "error");
+                    showProAlert("FACE NOT DETECTED! PLEASE SHOW YOUR FACE CLEARLY TO THE CAMERA.", "error"); 
                     return;
                 }
                 scanDuration--; timerDisplay.textContent = scanDuration;
