@@ -1,177 +1,141 @@
-/* --- 1. GLOBAL RESET & CYBER-PUNK DARK MODE SETUP --- */
+/* --- 🚀 1. PROFESSIONAL FUN LANDING PAGE STYLES --- */
+#landing-page {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: #08080c; color: #fff; z-index: 9999; 
+    overflow-y: auto; overflow-x: hidden;
+    font-family: 'Roboto', sans-serif; display: flex; flex-direction: column;
+    scrollbar-width: none; -ms-overflow-style: none;
+}
+#landing-page::-webkit-scrollbar { display: none; }
+
+.fun-bg-elements {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: radial-gradient(circle at 10% 10%, #ff00ff0a 0%, transparent 40%),
+                radial-gradient(circle at 90% 90%, #00ffff0a 0%, transparent 40%);
+    z-index: -1;
+}
+
+.pro-header {
+    display: flex; justify-content: space-between; padding: 25px 8%;
+    align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.logo-terminal {
+    font-family: 'Press Start 2P'; font-size: 1.2rem; color: #00ff00;
+    letter-spacing: 2px; text-shadow: 0 0 10px #00ff00;
+}
+
+.dev-name-animated {
+    font-size: 11px; font-weight: 900; letter-spacing: 1px;
+    font-family: 'Orbitron';
+    background: linear-gradient(to right, #00ff00, #00ffff, #00ff00);
+    background-size: 200% auto;
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    animation: rainbow-move 4s linear infinite;
+}
+@keyframes rainbow-move { to { background-position: 200% center; } }
+
+.hero-content { text-align: center; padding: 60px 8% 40px; }
+
+.badge-new {
+    display: inline-block; background: #00ff0011; color: #00ff00; padding: 5px 20px;
+    border-radius: 4px; font-family: 'Orbitron'; font-size: 10px; font-weight: 900;
+    margin-bottom: 20px; border: 1px solid #00ff00;
+}
+
+.hero-title { font-family: 'Orbitron'; font-size: clamp(2rem, 7vw, 4rem); line-height: 1.1; margin-bottom: 25px; font-weight: 900; }
+.color-text { 
+    background: linear-gradient(90deg, #ff00ff, #00ffff, #00ff00);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+
+.hero-p { 
+    color: #bbb; max-width: 700px; margin: 0 auto 40px; line-height: 1.8; 
+    font-size: 1.1rem; background: rgba(255,255,255,0.02); padding: 25px;
+    border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);
+}
+
+.start-btn {
+    background: #00ff00; color: #000; border: none; padding: 20px 60px;
+    font-family: 'Orbitron'; font-weight: 900; cursor: pointer;
+    font-size: 1.2rem; border-radius: 4px; transition: 0.3s;
+    box-shadow: 0 10px 20px rgba(0,255,0,0.2);
+}
+.start-btn:hover { background: #fff; transform: translateY(-3px); box-shadow: 0 15px 30px rgba(255,255,255,0.15); }
+
+.modes-info-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px; padding: 40px 8%;
+}
+.info-card { background: #0c0c12; padding: 45px 30px; border-radius: 15px; border: 1px solid #1a1a25; transition: 0.4s; }
+.card-num-fun {
+    width: 45px; height: 45px; background: #222; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Press Start 2P'; font-size: 12px; margin-bottom: 25px;
+}
+.pink-card .card-num-fun { background: #ff00ff; color: #fff; }
+.cyan-card .card-num-fun { background: #00ffff; color: #000; }
+.lime-card .card-num-fun { background: #00ff00; color: #000; }
+
+.info-card h3 { font-family: 'Orbitron'; font-size: 1.3rem; margin-bottom: 15px; text-transform: uppercase; }
+.pink-card h3 { color: #ff00ff; }
+.cyan-card h3 { color: #00ffff; }
+.lime-card h3 { color: #00ff00; }
+.info-card p { color: #888; font-size: 0.95rem; line-height: 1.7; }
+.info-card:hover { transform: translateY(-10px); border-color: #444; }
+
+.pro-footer-bar {
+    display: flex; justify-content: space-between; padding: 50px 8%;
+    border-top: 1px solid rgba(255,255,255,0.1); background: #050508;
+}
+.footer-item-big { font-family: 'Orbitron'; font-size: 14px; font-weight: 700; color: #00ff00; letter-spacing: 2px; }
+.v-tag-big { font-family: 'Orbitron'; font-size: 14px; font-weight: 900; color: #00ffff; }
+
+@media (max-width: 600px) {
+    .pro-header { padding: 25px 5%; flex-direction: column; gap: 15px; }
+    .hero-title { font-size: 2rem; }
+    .hero-p { font-size: 0.95rem; }
+    .pro-footer-bar { flex-direction: column; gap: 20px; align-items: center; text-align: center; }
+}
+
+/* --- 🛠️ 2. ORIGINAL APP INTERFACE (UNCHANGED) --- */
 :root {
-    --color-primary: #00ff00; /* NEON GREEN */
-    --color-secondary: #ff3333; /* VIBRANT RED */
-    --color-background: #0a0a0a; 
-    --color-surface: #1a1a1a; 
-    --color-text: #e0e0e0; 
-    --color-glow-blue: #00ffff; /* NEON CYAN */
+    --color-primary: #00ff00; --color-secondary: #ff3333; 
+    --color-background: #0a0a0a; --color-surface: #1a1a1a; 
+    --color-text: #e0e0e0; --color-glow-blue: #00ffff;
 }
-
 body {
-    font-family: 'Orbitron', sans-serif; 
-    margin: 0;
-    padding: 0;
-    background-color: var(--color-background); 
-    color: var(--color-text);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    overflow: hidden; 
-    position: relative;
-    user-select: none;
+    font-family: 'Orbitron', sans-serif; margin: 0; padding: 0;
+    background-color: var(--color-background); color: var(--color-text);
+    display: flex; justify-content: center; align-items: center;
+    min-height: 100vh; overflow-x: hidden; position: relative; user-select: none;
 }
-
 #app-container {
-    width: 90vw;
-    max-width: 600px; 
-    background: var(--color-surface); 
-    border: 2px solid var(--color-glow-blue);
-    border-radius: 0; 
-    padding: 40px 30px;
+    width: 90vw; max-width: 600px; 
+    background: var(--color-surface); border: 2px solid var(--color-glow-blue);
+    border-radius: 0; padding: 40px 30px;
     box-shadow: 0 0 50px rgba(0, 255, 255, 0.4), inset 0 0 10px rgba(0, 255, 0, 0.2); 
-    text-align: center;
-    max-height: 98vh;
-    overflow-y: auto; 
+    text-align: center; max-height: 98vh; overflow-y: auto; margin: auto;
 }
-
 .screen { display: none; padding: 10px 0; }
 .screen.active { display: block; }
-
-/* --- 2. TYPOGRAPHY & HEADER --- */
-.app-title {
-    font-family: 'Press Start 2P', cursive;
-    font-size: 1.8em;
-    color: var(--color-primary);
-    text-shadow: 0 0 15px var(--color-primary);
-    margin-bottom: 5px;
-    letter-spacing: 2px;
-}
+.app-title { font-family: 'Press Start 2P', cursive; font-size: 1.8em; color: var(--color-primary); text-shadow: 0 0 15px var(--color-primary); margin-bottom: 5px; letter-spacing: 2px; }
 .app-subtitle { font-size: 0.5em; display: block; color: var(--color-secondary); font-family: 'Orbitron', sans-serif;}
-
-.glow-divider {
-    height: 3px; 
-    background: linear-gradient(to right, transparent, var(--color-glow-blue), var(--color-primary), transparent);
-    box-shadow: 0 0 15px var(--color-glow-blue); 
-    margin: 15px auto 40px;
-}
-
-/* --- 3. CONTROLS --- */
+.glow-divider { height: 3px; background: linear-gradient(to right, transparent, var(--color-glow-blue), var(--color-primary), transparent); box-shadow: 0 0 15px var(--color-glow-blue); margin: 15px auto 40px; }
 .input-label { color: var(--color-glow-blue); margin-bottom: 15px; display: block; font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 1.1em; text-transform: uppercase; }
-.cyber-dropdown {
-    width: 95%; padding: 16px; font-size: 1.1em; background-color: #000; 
-    color: var(--color-primary);
-    border: 1px solid var(--color-primary); 
-    border-radius: 0; 
-    margin-bottom: 35px; appearance: none; cursor: pointer;
-    box-shadow: inset 0 0 10px rgba(0, 255, 0, 0.4);
-    font-family: 'Orbitron', sans-serif;
-    outline: none;
-}
-.cyber-dropdown:focus { border-color: var(--color-glow-blue); box-shadow: 0 0 15px var(--color-glow-blue); }
-
-.cyber-button {
-    border-radius: 0; 
-    font-family: 'Orbitron', sans-serif;
-    font-weight: 700;
-    padding: 15px 20px;
-    font-size: 1.1em;
-    cursor: pointer; 
-    transition: all 0.3s ease;
-    border: 1px solid transparent; 
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    outline: none;
-}
-.primary-button { 
-    background: var(--color-primary); 
-    color: var(--color-background); 
-    box-shadow: 0 0 20px var(--color-primary); 
-}
-.secondary-button { 
-    background: var(--color-surface); 
-    color: var(--color-secondary); 
-    border-color: var(--color-secondary);
-    box-shadow: 0 0 10px var(--color-secondary);
-}
-.cyber-button:hover { 
-    transform: translateY(-2px); 
-    box-shadow: 0 0 30px var(--color-primary), 0 0 15px var(--color-secondary); 
-}
-
-/* --- 4. SCANNING SCREEN --- */
-.scan-status { 
-    color: var(--color-secondary); 
-    text-shadow: 0 0 8px var(--color-secondary);
-    font-size: 1.2em;
-    margin-bottom: 25px;
-}
-.video-display-area {
-    position: relative; width: 95%; max-width: 450px; aspect-ratio: 4/3; 
-    overflow: hidden; 
-    margin: 0px auto;
-    border: 2px solid var(--color-glow-blue); 
-    border-radius: 6px;
-    box-shadow: 0 0 25px var(--color-glow-blue);
-    background-color: #000; 
-}
+.cyber-dropdown { width: 95%; padding: 16px; font-size: 1.1em; background-color: #000; color: var(--color-primary); border: 1px solid var(--color-primary); border-radius: 0; margin-bottom: 35px; appearance: none; cursor: pointer; box-shadow: inset 0 0 10px rgba(0, 255, 0, 0.4); font-family: 'Orbitron', sans-serif; outline: none; }
+.cyber-button { border-radius: 0; font-family: 'Orbitron', sans-serif; font-weight: 700; padding: 15px 20px; font-size: 1.1em; cursor: pointer; transition: all 0.3s ease; border: 1px solid transparent; text-transform: uppercase; letter-spacing: 1px; outline: none; }
+.primary-button { background: var(--color-primary); color: var(--color-background); box-shadow: 0 0 20px var(--color-primary); }
+.secondary-button { background: var(--color-surface); color: var(--color-secondary); border-color: var(--color-secondary); box-shadow: 0 0 10px var(--color-secondary); }
+.cyber-button:hover { transform: translateY(-2px); box-shadow: 0 0 30px var(--color-primary), 0 0 15px var(--color-secondary); }
+.scan-status { color: var(--color-secondary); text-shadow: 0 0 8px var(--color-secondary); font-size: 1.2em; margin-bottom: 25px; }
+.video-display-area { position: relative; width: 95%; max-width: 450px; aspect-ratio: 4/3; overflow: hidden; margin: 0px auto; border: 2px solid var(--color-glow-blue); border-radius: 6px; box-shadow: 0 0 25px var(--color-glow-blue); background-color: #000; }
 #videoElement { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
-
-.real-scanner-line {
-    position: absolute; left: 0; width: 100%; height: 8px; 
-    background: var(--color-primary); 
-    box-shadow: 0 0 20px 8px rgba(0, 255, 0, 0.7); 
-    top: 0; 
-    animation: realScan 1.5s linear infinite alternate; 
-    opacity: 0.9;
-}
-@keyframes realScan {
-    0% { top: 0%; } 
-    100% { top: calc(100% - 8px); } 
-}
-
-.scan-timer { 
-    position: relative; 
-    margin-top: 25px;
-    background: var(--color-surface); 
-    padding: 10px 20px; 
-    border: 1px solid var(--color-secondary); 
-    color: var(--color-primary); 
-    font-family: 'Orbitron', sans-serif;
-    font-weight: 700;
-    border-radius: 4px;
-    box-shadow: inset 0 0 10px rgba(255, 51, 51, 0.3);
-}
-
-/* --- 5. RESULT SCREEN --- */
-.result-display-frame {
-    position: relative; 
-    width: 95%; max-width: 450px; margin: 30px auto; 
-    overflow: visible; 
-    aspect-ratio: 4/3;
-    z-index: 10;
-}
-#capturedCanvas {
-    width: 100%;
-    height: 100%;
-    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-    transform: none; 
-    border: 3px solid var(--color-primary);
-    border-radius: 6px;
-    box-shadow: 0 0 25px var(--color-primary);
-    background-color: #000; 
-}
-.result-display-frame.active #capturedCanvas {
-    transform: rotate(2deg) scale(1.05) translate(10px, -10px); 
-    box-shadow: 0 0 40px var(--color-secondary), 5px 5px 15px rgba(0,0,0,0.5); 
-    border: 5px solid var(--color-secondary); 
-    animation: crashShake 0.4s ease-out 1;
-}
-@keyframes crashShake {
-    0% { transform: translate(0, 0) rotate(0deg) scale(1); }
-    50% { transform: translate(6px, -6px) rotate(3deg) scale(1.03); }
-    100% { transform: translate(10px, -10px) rotate(2deg) scale(1.05); }
-}
-
+.real-scanner-line { position: absolute; left: 0; width: 100%; height: 8px; background: var(--color-primary); box-shadow: 0 0 20px 8px rgba(0, 255, 0, 0.7); top: 0; animation: realScan 1.5s linear infinite alternate; opacity: 0.9; }
+@keyframes realScan { 0% { top: 0%; } 100% { top: calc(100% - 8px); } }
+.scan-timer { position: relative; margin-top: 25px; background: var(--color-surface); padding: 10px 20px; border: 1px solid var(--color-secondary); color: var(--color-primary); font-family: 'Orbitron', sans-serif; font-weight: 700; border-radius: 4px; box-shadow: inset 0 0 10px rgba(255, 51, 51, 0.3); }
+.result-display-frame { position: relative; width: 95%; max-width: 450px; margin: 30px auto; overflow: visible; aspect-ratio: 4/3; z-index: 10; }
+#capturedCanvas { width: 100%; height: 100%; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); transform: none; border: 3px solid var(--color-primary); border-radius: 6px; box-shadow: 0 0 25px var(--color-primary); background-color: #000; }
+.result-display-frame.active #capturedCanvas { transform: rotate(2deg) scale(1.05) translate(10px, -10px); box-shadow: 0 0 40px var(--color-secondary), 5px 5px 15px rgba(0,0,0,0.5); border: 5px solid var(--color-secondary); animation: crashShake 0.4s ease-out 1; }
+@keyframes crashShake { 0% { transform: translate(0, 0) rotate(0deg) scale(1); } 50% { transform: translate(6px, -6px) rotate(3deg) scale(1.03); } 100% { transform: translate(10px, -10px) rotate(2deg) scale(1.05); } }
 .control-panel { display: flex; justify-content: space-around; gap: 15px; margin-top: 40px; }

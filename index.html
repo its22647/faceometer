@@ -3,12 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Face-o-Meter by Aamir</title>
-    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Orbitron:wght@400;700&family=Press+Start+2P&family=Permanent+Marker&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <title>Face-o-Meter | Neural Analysis</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Orbitron:wght@400;700;900&family=Press+Start+2P&family=Permanent+Marker&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="app-container">
+    <div id="landing-page">
+        <div class="fun-bg-elements"></div>
+        <header class="pro-header">
+            <div class="logo-terminal" id="terminal-logo"></div>
+            <div class="dev-name-animated">Developed by Muhammad Aamir</div>
+        </header>
+
+        <main class="hero-content">
+            <div class="badge-new">SYSTEM STATUS: AGGRESSIVE</div>
+            <h1 class="hero-title">READY TO GET <br><span class="color-text">EMOTIONALLY DESTROYED?</span></h1>
+            
+            <p class="hero-p">
+                Forget those fake beauty filters that lie to you everyday. This AI doesn't have feelings, and it definitely doesn't like your face. 
+                Advanced algorithms calculate exactly why your mirror is tired of looking at you. 
+                It’s not just a scan; it’s a reality check you didn't ask for.
+            </p>
+
+            <div class="btn-box">
+                <button class="start-btn" onclick="triggerRealBrowserLoad('app')">GET ROASTED NOW 🚀</button>
+            </div>
+        </main>
+
+        <section class="modes-info-grid">
+            <div class="info-card pink-card">
+                <div class="card-num-fun">01</div>
+                <h3>Roasting King</h3>
+                <p>The boss of burns. It measures facial symmetry just to tell you that you look like a confused pigeon.</p>
+            </div>
+            <div class="info-card cyan-card">
+                <div class="card-num-fun">02</div>
+                <h3>Hyper Burner</h3>
+                <p>Fast and brutal. This mode is so quick it will hurt your feelings before you can even say "Wait, what?"</p>
+            </div>
+            <div class="info-card lime-card">
+                <div class="card-num-fun">03</div>
+                <h3>Destroyer</h3>
+                <p>The silent killer. One word. Total destruction. It’s like a slap in the face, but digital.</p>
+            </div>
+        </section>
+
+        <footer class="pro-footer-bar">
+            <span class="footer-item-big">© 2026 | MUHAMMAD AAMIR | TECH DIVISION</span>
+            <span class="v-tag-big">VERSION 1.0</span>
+        </footer>
+    </div>
+
+    <div id="app-container" style="display: none;">
         <div id="modes-screen" class="screen active">
             <h1 class="app-title">FACE-O-METER <span class="app-subtitle">by Aamir</span></h1>
             <div class="glow-divider"></div>
@@ -32,11 +78,42 @@
             </div>
             <div class="control-panel">
                 <button id="new-scan-btn" class="cyber-button secondary-button">🔄 RE-SCAN</button>
-                <button id="back-to-modes-btn" class="cyber-button primary-button">🏠 SELECT NEW PROTOCOL</button>
+                <button id="back-to-modes-btn" class="cyber-button primary-button" onclick="triggerRealBrowserLoad('landing')">🏠 SELECT NEW PROTOCOL</button>
             </div>
         </div>
     </div>
 
     <script type="module" src="script.js"></script>
+    <script>
+        // Terminal Animation
+        const logoText = "FACE-O-METER";
+        let i = 0;
+        function typeLogo() {
+            if (i < logoText.length) {
+                document.getElementById("terminal-logo").innerHTML += logoText.charAt(i);
+                i++;
+                setTimeout(typeLogo, 150);
+            }
+        }
+
+        // 🚀 TRICK BROWSER INTO REAL LOADING BAR
+        function triggerRealBrowserLoad(target) {
+            if(target === 'app') {
+                window.location.search = "view=app"; // Page will refresh & browser bar will show
+            } else {
+                window.location.search = "view=home"; // Page will refresh back to home
+            }
+        }
+
+        window.onload = () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('view') === 'app') {
+                document.getElementById('landing-page').style.display = 'none';
+                document.getElementById('app-container').style.display = 'block';
+            } else {
+                typeLogo();
+            }
+        };
+    </script>
 </body>
 </html>
