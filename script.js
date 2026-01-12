@@ -66,7 +66,7 @@ const modes = [
             "Aaina dekha hai? Nahi dekhna, warna wo bhi dar jayega.",
             "Abey tu insan hai, lagta to nahi 😂",
             "ERROR 99: Dost kam hain? Reason tum khud ho 🤣",
-            "Tum jab gussa hoty ho, samny waly ko hansi aa jati hai.",
+            "Tum jab gussa hoty ho, samny waly ko hansi aa jati hai 😂",
             "Tumhara dimagh slow chalta hai. Restart karo.",
             "Fazool insan 😂",
             "Tujhy to koi party me bhi invite nahi karta 😉",
