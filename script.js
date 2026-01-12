@@ -7,7 +7,7 @@ const modes = [
     {
         id: 'roasting-king', icon: '😈', name: 'The Roasting King',
         comments: [
-            "SCAN FAILURE: Screen toot jayegi, itna ghoor ke mat dekho! 💔 Ghoorna band karo!", 
+            "SCAN FAILURE: Arey ghoorna band kar, sirf dekhna hai 🤣!", 
             "ERROR 404: Teri battery low hai, charge ho kar aa 😂",
             "Chal nikal, tu hai he fazool insan 🤣",
             "Tu is waqt duniya ka 8th ajooba hai 😉",
