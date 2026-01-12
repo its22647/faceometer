@@ -44,7 +44,7 @@
 
 ## 👨‍💻 Developed By
 
-**Muhammad Aamir** *Systems & Engineering Division*
+**Muhammad Aamir**
 
 ---
 © 2026 Muhammad Aamir | Tech Division
