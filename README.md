@@ -38,7 +38,7 @@
 ## ⚠️ WARNING (LEGAL DISCLAIMER)
 
 > [!CAUTION]
-> **Muhammad Aamir** and the development team are **NOT responsible** for any emotional damage, broken egos, or shattered mirrors caused by this application. Use this at your own risk. If you can't handle the truth, stick to beauty filters.
+> **Muhammad Aamir** is **NOT responsible** for any emotional damage, broken egos, or shattered mirrors caused by this application. Use this at your own risk. If you can't handle the truth, stick to beauty filters.
 
 ---
 
