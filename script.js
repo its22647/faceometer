@@ -106,7 +106,7 @@ const capturedCanvas = document.getElementById('capturedCanvas');
 const timerDisplay = document.getElementById('timer-display');
 const resultDisplayFrame = document.querySelector('.result-display-frame'); 
 
-// --- 3. AI SETUP ---
+// --- 3. AI SETUP (Optimized for First-Time Lag) ---
 async function setupFaceAI() {
     let dots = "";
     const loadingInterval = setInterval(() => {
@@ -123,6 +123,12 @@ async function setupFaceAI() {
             await new Promise(r => s.onload = r);
         }
         faceDetector = await blazeface.load();
+        
+        // 🚀 WARM-UP EXECUTION: Prevents lag during first scan
+        const dummyCanvas = document.createElement('canvas');
+        dummyCanvas.width = 100; dummyCanvas.height = 100;
+        await faceDetector.estimateFaces(dummyCanvas, false);
+
         isAIReady = true; 
         clearInterval(loadingInterval);
         startScanBtn.textContent = ">>> BEGIN ANALYSIS <<<";
@@ -138,7 +144,8 @@ async function setupFaceAI() {
 async function checkFaceVisibility() {
     if (!faceDetector) return true;
     const predictions = await faceDetector.estimateFaces(videoElement, false);
-    return predictions.length > 0 && predictions[0].probability[0] > 0.85;
+    // 🌑 STRICT LOW LIGHT: Increased probability to 0.92 to detect dark faces better
+    return predictions.length > 0 && predictions[0].probability[0] > 0.92;
 }
 
 // --- 4. MODERN ALERT ---
@@ -251,13 +258,19 @@ function startScan() {
         videoStream = stream; videoElement.srcObject = stream;
         videoElement.onloadeddata = async () => { 
             await faceDetector.estimateFaces(videoElement, false); 
+            // 🚀 FRAME SKIPPING: Skip cycles to reduce lag on mobile
+            let cycleCount = 0;
             const timerInterval = setInterval(async () => {
-                const isFaceVisible = await checkFaceVisibility();
-                if (!isFaceVisible) {
-                    clearInterval(timerInterval); stopCamera(); switchScreen('modes-screen');
-                    showProAlert("FACE NOT DETECTED! PLEASE SHOW YOUR FACE CLEARLY TO THE CAMERA.", "error"); 
-                    return;
+                cycleCount++;
+                if (cycleCount % 2 === 0) { // Analysis every 2nd cycle for smoothness
+                   const isFaceVisible = await checkFaceVisibility();
+                   if (!isFaceVisible) {
+                       clearInterval(timerInterval); stopCamera(); switchScreen('modes-screen');
+                       showProAlert("Face not detected! Please show your face clearly to the camera.", "error"); 
+                       return;
+                   }
                 }
+                
                 scanDuration--; timerDisplay.textContent = scanDuration;
                 if (scanDuration <= 0) { clearInterval(timerInterval); setTimeout(captureAndShowResult, 100); }
             }, 1000);
@@ -322,14 +335,11 @@ startScanBtn.addEventListener('click', startScan);
 document.addEventListener('DOMContentLoaded', () => {
     initProtocolDrawer();
     setupFaceAI();
-    
     const controlPanel = document.querySelector('.control-panel');
     if (controlPanel) {
         controlPanel.innerHTML = "";
-        // 🚀 FIXING SCROLL: Compact Row Layout
         controlPanel.style = "display: flex; flex-wrap: nowrap; gap: 8px; padding: 10px; width: 100%; max-width: 100%; overflow-x: auto; justify-content: center; align-items: center; margin-top: 10px;";
         
-        // ✨ Glassmorphism Cyber Design
         const createCompactBtn = (text, icon, color, action) => {
             const btn = document.createElement('button');
             btn.innerHTML = `<span style="font-size:16px">${icon}</span> <div style="font-size:9px; margin-top:2px;">${text}</div>`;
