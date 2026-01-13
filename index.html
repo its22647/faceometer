@@ -77,15 +77,12 @@
                 <canvas id="capturedCanvas"></canvas>
             </div>
             <div class="control-panel">
-                <button id="new-scan-btn" class="cyber-button secondary-button">🔄 RE-SCAN</button>
-                <button id="back-to-modes-btn" class="cyber-button primary-button" onclick="triggerRealBrowserLoad('landing')">🏠 SELECT NEW PROTOCOL</button>
-            </div>
+                </div>
         </div>
     </div>
 
     <script type="module" src="script.js"></script>
     <script>
-        // Terminal Animation
         const logoText = "FACE-O-METER";
         let i = 0;
         function typeLogo() {
@@ -96,12 +93,11 @@
             }
         }
 
-        // 🚀 TRICK BROWSER INTO REAL LOADING BAR
         function triggerRealBrowserLoad(target) {
             if(target === 'app') {
-                window.location.search = "view=app"; // Page will refresh & browser bar will show
+                window.location.search = "view=app";
             } else {
-                window.location.search = "view=home"; // Page will refresh back to home
+                window.location.search = "view=home";
             }
         }
 

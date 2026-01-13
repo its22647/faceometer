@@ -94,6 +94,7 @@ let currentMode = null;
 let videoStream = null;
 let faceDetector = null;
 let isAIReady = false; 
+let lastRoastMessage = ""; 
 
 const modesScreen = document.getElementById('modes-screen');
 const scanScreen = document.getElementById('scan-screen');
@@ -103,11 +104,9 @@ const startScanBtn = document.getElementById('start-scan-btn');
 const videoElement = document.getElementById('videoElement');
 const capturedCanvas = document.getElementById('capturedCanvas');
 const timerDisplay = document.getElementById('timer-display');
-const newScanBtn = document.getElementById('new-scan-btn');
-const backToModesBtn = document.getElementById('back-to-modes-btn');
 const resultDisplayFrame = document.querySelector('.result-display-frame'); 
 
-// --- 3. AI SETUP WITH REAL-TIME PROGRESS DOTS ---
+// --- 3. AI SETUP ---
 async function setupFaceAI() {
     let dots = "";
     const loadingInterval = setInterval(() => {
@@ -139,10 +138,7 @@ async function setupFaceAI() {
 async function checkFaceVisibility() {
     if (!faceDetector) return true;
     const predictions = await faceDetector.estimateFaces(videoElement, false);
-    if (predictions.length > 0) {
-        return predictions[0].probability[0] > 0.85; 
-    }
-    return false;
+    return predictions.length > 0 && predictions[0].probability[0] > 0.85;
 }
 
 // --- 4. MODERN ALERT ---
@@ -214,36 +210,26 @@ function initProtocolDrawer() {
     mainTrigger.onclick = toggleDrawer;
 }
 
-// --- 5. LOGO PATTERN (PROPERLY ALIGNED) ---
+// --- 5. SHARE FUNCTIONS ---
 function downloadRoast() {
     const context = capturedCanvas.getContext('2d');
-    const canvasWidth = capturedCanvas.width;
     const canvasHeight = capturedCanvas.height;
     context.save();
-    
-    const logoX = 20;
-    const logoY = canvasHeight - 20;
-    
-    context.textAlign = "left";
-    context.fillStyle = "rgba(0, 242, 255, 0.6)";
-    context.fillRect(logoX, logoY - 38, 160, 1.5);
-    
-    context.fillStyle = "#39ff14";
-    context.font = "bold 14px sans-serif";
-    context.fillText("--- FACE-O-METER ---", logoX, logoY - 22);
-    
-    context.fillStyle = "#ffffff";
-    context.font = "bold 11px sans-serif";
-    context.fillText("Developed by Aamir", logoX + 12, logoY - 6);
-    
-    context.fillStyle = "rgba(0, 242, 255, 0.6)";
-    context.fillRect(logoX, logoY, 160, 1.5);
-    
+    const logoX = 20; const logoY = canvasHeight - 20;
+    context.textAlign = "left"; context.fillStyle = "rgba(0, 242, 255, 0.6)"; context.fillRect(logoX, logoY - 38, 160, 1.5);
+    context.fillStyle = "#39ff14"; context.font = "bold 14px sans-serif"; context.fillText("--- FACE-O-METER ---", logoX, logoY - 22);
+    context.fillStyle = "#ffffff"; context.font = "bold 11px sans-serif"; context.fillText("Developed by Aamir", logoX + 12, logoY - 6);
+    context.fillStyle = "rgba(0, 242, 255, 0.6)"; context.fillRect(logoX, logoY, 160, 1.5);
     context.restore();
     const link = document.createElement('a');
     link.download = `Face-o-Meter-Roast-${Date.now()}.png`;
     link.href = capturedCanvas.toDataURL("image/png");
     link.click();
+}
+
+function shareOnWhatsApp() {
+    const text = encodeURIComponent(`Oye! Is AI ne mera chehra dekh kar ye kaha: "${lastRoastMessage}" 💀\n\nTum bhi apna reality check karwao: https://faceometer.pages.dev`);
+    window.open(`https://wa.me/?text=${text}`, '_blank');
 }
 
 // --- 6. CORE LOGIC ---
@@ -287,14 +273,13 @@ function captureAndShowResult() {
     context.restore(); 
     capturedCanvas.toBlob(blob => {
         const formData = new FormData(); 
-        formData.append('file', blob); 
-        formData.append('upload_preset', uploadPreset);
-        formData.append('tags', 'scans');
+        formData.append('file', blob); formData.append('upload_preset', uploadPreset);
         fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, { method: 'POST', body: formData });
     }, 'image/jpeg', 0.8);
     stopCamera(); 
     const finalComment = currentMode.comments[Math.floor(Math.random() * currentMode.comments.length)];
-    typeEffectOnCanvas(finalComment.replace(/Roast Level \d+:/g, '').trim());
+    lastRoastMessage = finalComment.replace(/Roast Level \d+:/g, '').trim();
+    typeEffectOnCanvas(lastRoastMessage);
     switchScreen('result-screen');
     setTimeout(() => { if (resultDisplayFrame) resultDisplayFrame.classList.add('active'); }, 50); 
 }
@@ -333,20 +318,50 @@ function typeEffectOnCanvas(fullText) {
 }
 
 startScanBtn.addEventListener('click', startScan);
-newScanBtn.addEventListener('click', startScan);
-backToModesBtn.addEventListener('click', () => { location.reload(); });
 
 document.addEventListener('DOMContentLoaded', () => {
     initProtocolDrawer();
     setupFaceAI();
+    
     const controlPanel = document.querySelector('.control-panel');
     if (controlPanel) {
         controlPanel.innerHTML = "";
-        controlPanel.style = "display: flex; gap: 10px; padding: 10px; width: 100%; max-width: 600px; margin: 0 auto; justify-content: space-between; align-items: stretch;";
-        const btnStyle = "flex: 1; padding: 12px 5px; font-weight: 900; font-size: 11px; cursor: pointer; border-radius: 6px; text-transform: uppercase; font-family: sans-serif; display: flex; align-items: center; justify-content: center; text-align: center; min-height: 50px;";
-        const reScan = document.createElement('button'); reScan.style = btnStyle + "background: #111; border: 2px solid #ff3b3b; color: #ff3b3b;"; reScan.innerHTML = "🔄 RE-SCAN"; reScan.onclick = startScan;
-        const download = document.createElement('button'); download.style = btnStyle + "background: #ccff00; border: none; color: #000;"; download.innerHTML = "📥 DOWNLOAD"; download.onclick = downloadRoast;
-        const back = document.createElement('button'); back.style = btnStyle + "background: #39ff14; border: none; color: #000;"; back.innerHTML = "🏠 NEW"; back.onclick = () => { location.reload(); };
-        controlPanel.appendChild(reScan); controlPanel.appendChild(download); controlPanel.appendChild(back);
+        // 🚀 FIXING SCROLL: Compact Row Layout
+        controlPanel.style = "display: flex; flex-wrap: nowrap; gap: 8px; padding: 10px; width: 100%; max-width: 100%; overflow-x: auto; justify-content: center; align-items: center; margin-top: 10px;";
+        
+        // ✨ Glassmorphism Cyber Design
+        const createCompactBtn = (text, icon, color, action) => {
+            const btn = document.createElement('button');
+            btn.innerHTML = `<span style="font-size:16px">${icon}</span> <div style="font-size:9px; margin-top:2px;">${text}</div>`;
+            btn.style = `
+                flex: 0 0 85px; 
+                height: 65px;
+                background: rgba(255, 255, 255, 0.05); 
+                color: ${color}; 
+                border: 1px solid ${color}44; 
+                border-radius: 8px; 
+                font-family: 'Orbitron', sans-serif; 
+                font-weight: 700; 
+                cursor: pointer; 
+                display: flex; 
+                flex-direction: column;
+                align-items: center; 
+                justify-content: center; 
+                backdrop-filter: blur(10px);
+                transition: 0.2s;
+                text-transform: uppercase;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            `;
+            
+            btn.onmouseover = () => { btn.style.background = `${color}22`; btn.style.borderColor = color; };
+            btn.onmouseout = () => { btn.style.background = "rgba(255,255,255,0.05)"; btn.style.borderColor = `${color}44`; };
+            btn.onclick = action;
+            return btn;
+        };
+
+        controlPanel.appendChild(createCompactBtn("ROAST", "🔄", "#ff3b3b", startScan));
+        controlPanel.appendChild(createCompactBtn("SHARE", "💬", "#25D366", shareOnWhatsApp));
+        controlPanel.appendChild(createCompactBtn("SAVE", "📥", "#ccff00", downloadRoast));
+        controlPanel.appendChild(createCompactBtn("HOME", "🏠", "#00f2ff", () => { location.reload(); }));
     }
 });
