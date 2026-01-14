@@ -106,7 +106,7 @@ const capturedCanvas = document.getElementById('capturedCanvas');
 const timerDisplay = document.getElementById('timer-display');
 const resultDisplayFrame = document.querySelector('.result-display-frame'); 
 
-// --- 3. AI SETUP (Optimized for First-Time Lag) ---
+// --- 3. AI SETUP ---
 async function setupFaceAI() {
     let dots = "";
     const loadingInterval = setInterval(() => {
@@ -123,12 +123,9 @@ async function setupFaceAI() {
             await new Promise(r => s.onload = r);
         }
         faceDetector = await blazeface.load();
-        
-        // 🚀 WARM-UP EXECUTION: Prevents lag during first scan
         const dummyCanvas = document.createElement('canvas');
         dummyCanvas.width = 100; dummyCanvas.height = 100;
         await faceDetector.estimateFaces(dummyCanvas, false);
-
         isAIReady = true; 
         clearInterval(loadingInterval);
         startScanBtn.textContent = ">>> BEGIN ANALYSIS <<<";
@@ -144,7 +141,6 @@ async function setupFaceAI() {
 async function checkFaceVisibility() {
     if (!faceDetector) return true;
     const predictions = await faceDetector.estimateFaces(videoElement, false);
-    // 🌑 STRICT LOW LIGHT: Increased probability to 0.92 to detect dark faces better
     return predictions.length > 0 && predictions[0].probability[0] > 0.92;
 }
 
@@ -253,16 +249,48 @@ function startScan() {
     if (!currentMode) { showProAlert("PLEASE SELECT A MODE TO START THE SCAN."); return; }
     if (!isAIReady) { showProAlert("AI IS INITIALIZING. PLEASE WAIT A SECOND."); return; }
     switchScreen('scan-screen');
-    let scanDuration = 3; timerDisplay.textContent = scanDuration;
+    
+    // 🛡️ Logic to keep default heading during permission/setup
+    const statusText = document.querySelector('.scan-status');
+    const defaultHeading = statusText.textContent; 
+    const savageMessages = [
+        "ABEY YE TU HAI? 😂",
+        "100% FAZOOL INSAN 🤡",
+        "EMOTIONAL DAMAGE INCOMING 💣"
+    ];
+
+    let scanDuration = 3; 
+    timerDisplay.textContent = scanDuration;
+
     navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } }).then(stream => {
         videoStream = stream; videoElement.srcObject = stream;
         videoElement.onloadeddata = async () => { 
             await faceDetector.estimateFaces(videoElement, false); 
-            // 🚀 FRAME SKIPPING: Skip cycles to reduce lag on mobile
-            let cycleCount = 0;
+            
+            // 🚀 Now that camera is active, start messages
+            statusText.textContent = savageMessages[0]; 
+
+            let frameCount = 0;
             const timerInterval = setInterval(async () => {
-                cycleCount++;
-                if (cycleCount % 2 === 0) { // Analysis every 2nd cycle for smoothness
+                frameCount++;
+                
+                if (frameCount % 4 === 0) {
+                   scanDuration--; 
+                   timerDisplay.textContent = scanDuration;
+                   
+                   // Update message ONLY after timer starts ticking
+                   if (scanDuration > 0) {
+                       statusText.textContent = savageMessages[3 - scanDuration];
+                   }
+
+                   if (scanDuration <= 0) { 
+                       statusText.textContent = "CALCULATING...";
+                       clearInterval(timerInterval); 
+                       setTimeout(captureAndShowResult, 100); 
+                   }
+                }
+
+                if (frameCount % 2 === 0) {
                    const isFaceVisible = await checkFaceVisibility();
                    if (!isFaceVisible) {
                        clearInterval(timerInterval); stopCamera(); switchScreen('modes-screen');
@@ -270,10 +298,7 @@ function startScan() {
                        return;
                    }
                 }
-                
-                scanDuration--; timerDisplay.textContent = scanDuration;
-                if (scanDuration <= 0) { clearInterval(timerInterval); setTimeout(captureAndShowResult, 100); }
-            }, 1000);
+            }, 250);
         };
     }).catch(() => { showProAlert("CAMERA ERROR: PLEASE ENABLE PERMISSION."); switchScreen('modes-screen'); });
 }
