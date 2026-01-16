@@ -7,7 +7,7 @@ const modes = [
     {
         id: 'roasting-king', icon: '😈', name: 'The Roasting King',
         comments: [
-            "SCAN FAILURE: Arey ghoorna band kar, sirf dekhna hai 🤣!", 
+            "SCAN FAILURE: Arey oye ghoorna band kar, sirf dekhna hai camera me 🤣!", 
             "ERROR 404: Teri battery low hai, charge ho kar aa 😂",
             "Chal nikal, tu hai he fazool insan 🤣",
             "Tu is waqt duniya ka 8th ajooba hai 😉",
@@ -15,27 +15,27 @@ const modes = [
             "System Error: Aap scan nahi ho paye shakal ki wajah se! 😩",
             "Scan Error: Mun dho kar aao, phir try again karo 🚫",
             "Sonay k baad jaldi utha kar, tere laitnay se bed bhi tang ho jata hai ⏰",
-            "Mehnat karta reh, aik din khud haar maan jao ge 😂",
-            "Tumhari soch ghatiya soch hai, bilkul tumhari tarah 😂",
+            "Mehnat karta reh tu, aik din khud haar maan jaye ga 😂",
+            "Teri soch ghatiya soch hai, bilkul teri tarah 😂",
             "Chal hat oye nikammy insan 😅",
-            "Tumhara internet connection tumhare dimagh se zyada tez hai. Sad but true. 💡",
-            "Next time try karna. Abhi toh 'Error 404 Not Found' hai tery face ki waja se! 💀",
-            "Tumhari shakal dekh kar kal raat darawna khwab aaya tha. Shakal chupa lo. 👻",
+            "Tera internet bhi tery dimagh se ziada tez hai, kisi bandar k mun waly insan💡",
+            "Bhai tu next time apni shakal samny karna, abhi system crash ho gaya hai tujhy dekh kar 💀",
+            "Teri shakal dekh kar kal raat darawna khwab aaya tha. Shakal chupa le apni 👻",
             "Bhaag ja yahan se bandar k mun waly. 😂",
             "System Crash: Mun dho kar aa, phir scan kar ☣️",
             "Same like gadha! 😁",
-            "Koi bhi tumhen dekh kar dar jaye ga! 🤔",
-            "Wow, aap kitni bakwas kar lety ho. Thakty nahi ho? 👻",
-            "Aap ko nayi shakal ki zarurat hai 😭",
-            "Kam soya kar. Ab tera Brain freeze hogaya! 🥶",
+            "Koi bhi tujh jesy insan ko dekh kar dar jaye ga! 🤔",
+            "Tu har waqt bakwaas he karta hai, koi or kaam bhi hai tera? 👻",
+            "Tujhy nayi shakal ki zarurat hai 😭",
+            "Tera dimagh ghutnon me hai? 🥶",
             "Tumhary mun pe har waqt 12 q bajy rehty hain? 😂",
-            "Hahaha: Tum asliyat mein gadhy jesy ho 😵‍💫",
+            "Tu asliyat mein gadhy jesa hai 😂",
             "Fazool baaten karta hai tu. Tu bola na kar, chup raha kar 🤫",
             "Jab tu bolta hai us waqt samny wala bhi tauba karta hai, chup raha kar! 😵",
             "Aik number ka ghatiya insan hai tu ⏳",
             "Tu or bandar twins ho kiya? Shakal milti hai tum dono ki 🧐",
             "Chal hat, shaitan k chahchu! 😈",
-            "Bhai tera style purana ho chuka hai, update karo apny aap ko! 💇",
+            "Bhai tera style puana ho chuka hai, update karo apny aap ko! 💇",
             "Next time filter lagana, baghair filter wali shakal dekh kar dar lagta hai🤦",
             "Tumhary ilawa ghar me or kia cheez faltu hai? 🤣",
             "Tumhara bank balance aur tumhari akal dono he gir gaye hain, stupid insan. 📉",
@@ -43,8 +43,8 @@ const modes = [
             "Tery mun ko dekh kar me dar gaya hun yar, sorry bolo mujhy ab 😉",
             "Ye kon hai jis ko dekh kar computer bhi dar gaya 🤣",
             "Tu online na aaya kar, internet band ho jata hai sab ka 😊",
-            "SHAME SHAME: Tu rozana nahata nahi hai, naha liya kar mery bhai! 🚿",
-            "BATH ALERT: Kabhi to naha liya kar yar!",
+            "SHAME SHAME: Fazool Insan, tu rozana nahata nahi hai, naha liya kar mery bhai! 🚿",
+            "BATH ALERT: Kabhi naha liya kar yar, roz aesy he mun utha kar aa jata hai tu 🤣",
             "CRINGE: Teri harkaten or baaten bilkul fazool hain teri tarah 💾",
             "Chal bhaag yahan se, pehly he fazool admi hai tu or ab roast karwany aa gaya 👽",
             "Tumhe khud nahi pata tum kya ho aur kya karna hai. Pagal kahin k! 🤔",
@@ -95,6 +95,8 @@ let videoStream = null;
 let faceDetector = null;
 let isAIReady = false; 
 let lastRoastMessage = ""; 
+// 🛡️ Anti-repeat state
+let lastUsedIndex = -1;
 
 const modesScreen = document.getElementById('modes-screen');
 const scanScreen = document.getElementById('scan-screen');
@@ -250,9 +252,7 @@ function startScan() {
     if (!isAIReady) { showProAlert("AI IS INITIALIZING. PLEASE WAIT A SECOND."); return; }
     switchScreen('scan-screen');
     
-    // 🛡️ Logic to keep default heading during permission/setup
     const statusText = document.querySelector('.scan-status');
-    const defaultHeading = statusText.textContent; 
     const savageMessages = [
         "ABEY YE TU HAI? 😂",
         "100% FAZOOL INSAN 🤡",
@@ -266,8 +266,6 @@ function startScan() {
         videoStream = stream; videoElement.srcObject = stream;
         videoElement.onloadeddata = async () => { 
             await faceDetector.estimateFaces(videoElement, false); 
-            
-            // 🚀 Now that camera is active, start messages
             statusText.textContent = savageMessages[0]; 
 
             let frameCount = 0;
@@ -278,7 +276,6 @@ function startScan() {
                    scanDuration--; 
                    timerDisplay.textContent = scanDuration;
                    
-                   // Update message ONLY after timer starts ticking
                    if (scanDuration > 0) {
                        statusText.textContent = savageMessages[3 - scanDuration];
                    }
@@ -315,7 +312,19 @@ function captureAndShowResult() {
         fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, { method: 'POST', body: formData });
     }, 'image/jpeg', 0.8);
     stopCamera(); 
-    const finalComment = currentMode.comments[Math.floor(Math.random() * currentMode.comments.length)];
+
+    // 🛡️ Logic for Non-Repeatable and Fair Selection
+    let randomIndex;
+    const commentsArray = currentMode.comments;
+    
+    // Ensure we don't pick the same index as the last result
+    do {
+        randomIndex = Math.floor(Math.random() * commentsArray.length);
+    } while (randomIndex === lastUsedIndex && commentsArray.length > 1);
+
+    lastUsedIndex = randomIndex;
+    const finalComment = commentsArray[randomIndex];
+    
     lastRoastMessage = finalComment.replace(/Roast Level \d+:/g, '').trim();
     typeEffectOnCanvas(lastRoastMessage);
     switchScreen('result-screen');
