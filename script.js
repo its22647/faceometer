@@ -80,7 +80,7 @@ const modes = [
     {
         id: 'ultimate-destroyer', icon: '💣', name: 'Ultimate Destroyer',
         comments: [
-            "FAIL", "Nikamma", "Donkey", "Gadhe kahin k", "Bandar", 
+            "Ullu kahin ka", "Nikamma", "Donkey", "Gadhe kahin k", "Bandar", 
             "Bekar Admi", "Fazool Insan", "PAGAL", "Khusra 😂",
             "LAZY", "Joker", "Aalsi Insan", "Aagy se hat ja 😂", "Bakwaas Admi", 
             "Chal bhaag oye", "Bht slow hai tu", "CRAZY", "Faltu Banda", "Chal hat",
